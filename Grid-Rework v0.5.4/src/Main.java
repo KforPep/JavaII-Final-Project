@@ -5,12 +5,28 @@
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.util.Optional;
+
+import javax.swing.JOptionPane;
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.CustomMenuItem;
+import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
@@ -23,6 +39,8 @@ public class Main extends Application{
 	 * This class opens and controls the window.
 	 * It shows the scene from Grid inside of it
 	 */
+	private MenuItem username;
+	private MenuItem quit;
 	
 	@SuppressWarnings("static-access")
 	@Override
@@ -38,6 +56,39 @@ public class Main extends Application{
 			Grid gameGrid = new Grid();
 			Pane returnedGamePane = gameGrid.start(mainStage.getHeight());	// Starts new Grid using mainStage's height for sizing
 			
+			//Option Menu Stuff
+			Menu menuOp = new Menu("Options");
+			username = new MenuItem("Username");
+			quit = new MenuItem("Quit");
+			
+			//Sound Menu Stuff
+			Menu soundMenu = new Menu("Sound");
+			//Character Noise Set up
+			CheckBox charCheck = new CheckBox();
+			Labeled charLabel = new Label("Character Noise");
+			charCheck.setSelected(true);
+			charLabel.setGraphic(charCheck);
+			CustomMenuItem charNoise = new CustomMenuItem(charLabel);
+			charNoise.setHideOnClick(false);
+			
+			//Ambient Noise Set up
+			Label ambLabel = new Label("Ambient Noise");
+			CheckBox ambCheck = new CheckBox();
+			ambCheck.setSelected(true);
+			ambLabel.setGraphic(ambCheck);
+			CustomMenuItem ambNoise = new CustomMenuItem(ambLabel);
+			ambNoise.setHideOnClick(false);
+			
+			//Add Menu Items
+			menuOp.getItems().addAll(username, quit);
+			soundMenu.getItems().addAll(charNoise, ambNoise);
+			
+
+			
+			MenuBar menuBar = new MenuBar();
+			menuBar.getMenus().addAll(menuOp, soundMenu);
+			
+			
 			// These Panes cover the left and right side of the screen
 			// to hide vehicles entering and exiting the scene
 			Pane leftSideCover = new Pane();
@@ -51,6 +102,7 @@ public class Main extends Application{
 			
 			// Set left, gameplay, and right on a BorderPane
 			BorderPane totalScreen = new BorderPane();
+			totalScreen.setTop(menuBar);
 			totalScreen.setCenter(returnedGamePane);
 			totalScreen.setRight(rightSideCover);
 			totalScreen.setLeft(leftSideCover);
@@ -61,6 +113,11 @@ public class Main extends Application{
 			{
 				gameGrid.sendKeyEvent(e);
 			});
+			
+			File file = new File(System.getProperty("user.dir") + "/images/Icon.jpg"); 
+			String localUrl = file.toURI().toURL().toString();
+			Image iconImage = new Image(localUrl);
+			mainStage.getIcons().add(iconImage);
 			
 			mainStage.setTitle("Class Simulator");
 			mainStage.setScene(scene);
@@ -82,6 +139,33 @@ public class Main extends Application{
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+		
+		//Menu Events
+		username.setOnAction(event ->{
+//			String user = JOptionPane.showInputDialog("Enter your username");
+//			JOptionPane.showMessageDialog(null, user);
+			Alert alert = new Alert(AlertType.INFORMATION);
+			alert.setTitle("Information Dialog");
+			alert.setHeaderText(null);
+			alert.setContentText("I have a great message for you!");
+
+			alert.showAndWait();
+		});
+		
+		quit.setOnAction(event ->{
+			Alert alert = new Alert(AlertType.CONFIRMATION);
+			alert.setTitle("Confirmation Dialog");
+			alert.setHeaderText("Look, a Confirmation Dialog");
+			alert.setContentText("Are you ok with this?");
+
+			Optional<ButtonType> result = alert.showAndWait();
+			if (result.get() == ButtonType.OK){
+				mainStage.close();
+			} else {
+			    // ... user chose CANCEL or closed the dialog
+			}
+			
+		});
 	}
 	
 	public static void main(String[] args) {
