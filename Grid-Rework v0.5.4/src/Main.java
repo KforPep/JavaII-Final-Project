@@ -6,14 +6,11 @@
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
-import java.net.MalformedURLException;
 import java.util.Optional;
 
-import javax.swing.JOptionPane;
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
-import javafx.geometry.Pos;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -39,7 +36,6 @@ public class Main extends Application{
 	 * This class opens and controls the window.
 	 * It shows the scene from Grid inside of it
 	 */
-	private MenuItem username;
 	private MenuItem quit;
 	
 	@SuppressWarnings("static-access")
@@ -58,7 +54,6 @@ public class Main extends Application{
 			
 			//Option Menu Stuff
 			Menu menuOp = new Menu("Options");
-			username = new MenuItem("Username");
 			quit = new MenuItem("Quit");
 			
 			//Sound Menu Stuff
@@ -80,7 +75,7 @@ public class Main extends Application{
 			ambNoise.setHideOnClick(false);
 			
 			//Add Menu Items
-			menuOp.getItems().addAll(username, quit);
+			menuOp.getItems().addAll(quit);
 			soundMenu.getItems().addAll(charNoise, ambNoise);
 			
 
@@ -140,29 +135,18 @@ public class Main extends Application{
 			e.printStackTrace();
 		}
 		
-		//Menu Events
-		username.setOnAction(event ->{
-//			String user = JOptionPane.showInputDialog("Enter your username");
-//			JOptionPane.showMessageDialog(null, user);
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Information Dialog");
-			alert.setHeaderText(null);
-			alert.setContentText("I have a great message for you!");
-
-			alert.showAndWait();
-		});
-		
+		// Menu Events
 		quit.setOnAction(event ->{
 			Alert alert = new Alert(AlertType.CONFIRMATION);
-			alert.setTitle("Confirmation Dialog");
-			alert.setHeaderText("Look, a Confirmation Dialog");
-			alert.setContentText("Are you ok with this?");
+			alert.setTitle("Quit?");
+			alert.setHeaderText("");
+			alert.setContentText("Are you sure you want to quit?");
 
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.get() == ButtonType.OK){
-				mainStage.close();
+				mainStage.close(); // closes the game
 			} else {
-			    // ... user chose CANCEL or closed the dialog
+			    // goes back to the game
 			}
 			
 		});
