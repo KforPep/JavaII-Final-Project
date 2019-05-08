@@ -143,7 +143,6 @@ public class Grid
 		//Stack pane to put objects on top of each other
 		StackPane stack = new StackPane();
 		stack.getChildren().add(vbxGrid); //Add game grid to stack pane
-		stack.getChildren().add(player); //Add player to stack pane
 		
 		//Add the arrays of moving objects on to the stack pane
 		car1.toPane(stack); //Cars 1 (row 2)
@@ -156,6 +155,9 @@ public class Grid
 		log3.toPane(stack); //Logs 3 (row 10)
 		log4.toPane(stack); //Logs 4 (row 11)
 		log5.toPane(stack); //Logs 5 (row 12)
+		
+		// Add player to stack
+		stack.getChildren().add(player); //Add player to stack pane
 		
 		//Stack pane layout
 		stack.setAlignment(Pos.CENTER);
