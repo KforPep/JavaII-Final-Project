@@ -4,6 +4,7 @@
  * Smoother animations
  */
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 
@@ -14,6 +15,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
@@ -24,6 +26,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
@@ -95,9 +98,14 @@ public class Grid
 			vbxGrid.getChildren().add(row); //Add the row to the grid VBox
 		}
 		
+		File jeffsBeautifulFaceFile = new File(System.getProperty("user.dir") + "/images/fisherPlayer.jpg");
+		String jeffsBeautifulFaceLocalUrl = jeffsBeautifulFaceFile.toURI().toURL().toString();
+		Image jeffsBeautifulFaceLocalImage = new Image(jeffsBeautifulFaceLocalUrl);
+		ImagePattern jeffsBeautifulFacePattern = new ImagePattern(jeffsBeautifulFaceLocalImage);
+		
 		//Draw the player
 		//Player(x, y, size, color)
-		player = new Player(RESPAWN_X, RESPAWN_Y, PLAYER_SIZE, Color.YELLOW);
+		player = new Player(RESPAWN_X, RESPAWN_Y, PLAYER_SIZE, jeffsBeautifulFacePattern);
 		
 		//Animation to move the player
 		mover = new TranslateTransition(Duration.millis(250), player);
@@ -115,35 +123,82 @@ public class Grid
 		leftSpawn = LEFT_COLUMN - OBJECT_SPAWN_DISTANCE; //left spawn point for moving objects
 		double defaultSize = TILE_SIZE - 10; //default object size
 		double logHeight = TILE_SIZE - 15; //default log height
-		Color logColor = Color.SADDLEBROWN; //default log color
+		//Color logColor = Color.SADDLEBROWN; //default log color
+		
+		
+		//all these images are cars or logs or busses
+		/*
+		 * Scool bus
+		 */
+		File file9 = new File(System.getProperty("user.dir") + "/images/schoolbus.png");
+		String localUrl9 = file9.toURI().toURL().toString();
+		Image localImage9 = new Image(localUrl9);
+		ImagePattern pattern9 = new ImagePattern(localImage9);
+		/*
+		 * Car 1
+		 */
+		File file11 = new File(System.getProperty("user.dir") + "/images/car1.png");
+		String localUrl11 = file11.toURI().toURL().toString();
+		Image localImage11 = new Image(localUrl11);
+		ImagePattern pattern11 = new ImagePattern(localImage11);
+		/*
+		 * Car 2
+		 */
+		File file12 = new File(System.getProperty("user.dir") + "/images/car2.png");
+		String localUrl12 = file12.toURI().toURL().toString();
+		Image localImage12 = new Image(localUrl12);
+		ImagePattern pattern12 = new ImagePattern(localImage12);
+		/*
+		 * Car 3
+		 */
+		File file13 = new File(System.getProperty("user.dir") + "/images/car3.png");
+		String localUrl13 = file13.toURI().toURL().toString();
+		Image localImage13 = new Image(localUrl13);
+		ImagePattern pattern13 = new ImagePattern(localImage13);
+		/*
+		 * Car 4
+		 */
+		File file14 = new File(System.getProperty("user.dir") + "/images/car4.png");
+		String localUrl14 = file14.toURI().toURL().toString();
+		Image localImage14 = new Image(localUrl14);
+		ImagePattern pattern14 = new ImagePattern(localImage14);	 
+
+		/*
+		 * Logs
+		 *    	      	      
+		 */
+		File file15 = new File(System.getProperty("user.dir") + "/images/log.png");
+		String localUrl15 = file15.toURI().toURL().toString();
+		Image localImage15 = new Image(localUrl15);
+		ImagePattern pattern15 = new ImagePattern(localImage15);
 		
 		//MovingObject(count, space, speed, velocity, width, height, startX, startY, color, animation type, carry player?)
 		
 		//Cars 1 (row 2)
-		MovingObject car1 = new MovingObject(3, 50, 60, 5, defaultSize, defaultSize, rightSpawn, row(2), Color.YELLOW, "LEFT", false);
+		MovingObject car1 = new MovingObject(3, 50, 60, 5, defaultSize, defaultSize, rightSpawn, row(2), pattern11, "LEFT", false);
 		//Cars 2 (row 3)
-		MovingObject car2 = new MovingObject(3, 50, 55, 5, defaultSize, defaultSize, leftSpawn, row(3), Color.ORANGERED, "RIGHT", false);
+		MovingObject car2 = new MovingObject(3, 50, 55, 5, defaultSize, defaultSize, leftSpawn, row(3), pattern12, "RIGHT", false);
 		//Cars 3 (row 4)
-		MovingObject car3 = new MovingObject(3, 60, 35, 5, defaultSize + 15, defaultSize, rightSpawn, row(4), Color.MEDIUMPURPLE, "LEFT", false);
+		MovingObject car3 = new MovingObject(3, 60, 35, 5, defaultSize + 15, defaultSize, rightSpawn, row(4), pattern13, "LEFT", false);
 		//Cars 4 (row 5)
-		MovingObject car4 = new MovingObject(2, 125, 30, 5, defaultSize + 30, defaultSize - 5, leftSpawn, row(5), Color.LAWNGREEN, "RIGHT", false);
+		MovingObject car4 = new MovingObject(2, 125, 30, 5, defaultSize + 30, defaultSize - 5, leftSpawn, row(5), pattern14, "RIGHT", false);
 		//Trucks (row 6)
-		MovingObject truck = new MovingObject(2, 75, 45, 5, (TILE_SIZE*2) - 10, defaultSize, rightSpawn, row(6), Color.ANTIQUEWHITE, "LEFT", false);
+		MovingObject truck = new MovingObject(2, 75, 45, 5, (TILE_SIZE*2) - 10, defaultSize, rightSpawn, row(6), pattern9, "LEFT", false);
 		//Logs 1 (row 8)
-		MovingObject log1 = new MovingObject(3, 85, 55, 5, (TILE_SIZE*2), logHeight, leftSpawn, row(8), logColor, "RIGHT", true);
+		MovingObject log1 = new MovingObject(3, 85, 55, 5, (TILE_SIZE*2), logHeight, leftSpawn, row(8), pattern15, "RIGHT", true);
 		//Logs 2 (row 9)
-		MovingObject log2 = new MovingObject(3, 85, 55, 5, (TILE_SIZE*2), logHeight, rightSpawn, row(9), logColor, "LEFT", true);
+		MovingObject log2 = new MovingObject(3, 85, 55, 5, (TILE_SIZE*2), logHeight, rightSpawn, row(9), pattern15, "LEFT", true);
 		//Logs 3 (row 10)
-		MovingObject log3 = new MovingObject(2, 125, 30, 5, (TILE_SIZE*4), logHeight, rightSpawn+75, row(10), logColor, "LEFT", true);
+		MovingObject log3 = new MovingObject(2, 125, 30, 5, (TILE_SIZE*4), logHeight, rightSpawn+75, row(10), pattern15, "LEFT", true);
 		//Logs 4 (row 11)
-		MovingObject log4 = new MovingObject(2, 65, 55, 5, (TILE_SIZE*3), logHeight, leftSpawn-75, row(11), logColor, "RIGHT", true);
+		MovingObject log4 = new MovingObject(2, 65, 55, 5, (TILE_SIZE*3), logHeight, leftSpawn-75, row(11), pattern15, "RIGHT", true);
 		//Logs 5 (row 12)
-		MovingObject log5 = new MovingObject(3, 85, 55, 5, (TILE_SIZE*2), logHeight, rightSpawn, row(12), logColor, "LEFT", true);
+		MovingObject log5 = new MovingObject(3, 85, 55, 5, (TILE_SIZE*2), logHeight, rightSpawn, row(12), pattern15, "LEFT", true);
 		
 		//Stack pane to put objects on top of each other
 		StackPane stack = new StackPane();
 		stack.getChildren().add(vbxGrid); //Add game grid to stack pane
-		stack.getChildren().add(player); //Add player to stack pane
+		
 		
 		//Add the arrays of moving objects on to the stack pane
 		car1.toPane(stack); //Cars 1 (row 2)
@@ -157,6 +212,7 @@ public class Grid
 		log4.toPane(stack); //Logs 4 (row 11)
 		log5.toPane(stack); //Logs 5 (row 12)
 		
+		stack.getChildren().add(player); //Add player to stack pane
 		//Stack pane layout
 		stack.setAlignment(Pos.CENTER);
 		stack.setMaxHeight(GRID_HEIGHT);
@@ -229,7 +285,6 @@ public class Grid
 		Timeline animation = new Timeline(new KeyFrame(Duration.millis(speedMillis), new EventHandler<ActionEvent>()
 		{
 			double xv = xVelocity; //X velocity of animation
-			double sendVelocity;
 			double objectStartPosition = object.getTranslateX(); //Starting position of the object
 			int frame = 0;
 			Bounds bounds = paneBounds; //Bounds of the layout pane
@@ -255,12 +310,10 @@ public class Grid
 					if (animationType.equalsIgnoreCase("LEFT")) //move left
 					{
 						object.setTranslateX(objectX - xv); //Move object left
-						sendVelocity = -xv;
 					}
 					else if (animationType.equalsIgnoreCase("RIGHT")) //move right
 					{
 						object.setTranslateX(objectX + xv); //Move object right
-						sendVelocity = xv;
 					}
 					
 					//If the object reaches the edge of the pane
@@ -289,7 +342,7 @@ public class Grid
 						else
 						{
 							player.setCarried(true);
-							player.carry(sendVelocity);
+							player.carry(object);
 						}
 					}
 					else
