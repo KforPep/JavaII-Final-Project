@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 import javafx.animation.TranslateTransition;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -59,13 +61,13 @@ public class Player extends Circle {
 	//Kill the player
 	public void kill()
 	{
-		if (this.getDrowning() == true && this.getCarried() == true) //save the player if they are being carried by a log
+		/*if (this.getDrowning() == true && this.getCarried() == true) //save the player if they are being carried by a log
 		{}
 		else
-		{
+		{*/
 			this.setTranslateX(x);
 			this.setTranslateY(y);
-		}
+		//}
 	} //kill
 	
 	//Set drowning status
@@ -103,5 +105,37 @@ public class Player extends Circle {
 	{
 		return this.moving;
 	} //getMoving
+	
+	//Check if a player is colliding with a log
+	public void checkCollision(ArrayList<ArrayList<MovingObject>> logs)
+	{
+		this.setCarried(false); //Flag the player as not being carried
+		int logRowCount = logs.size(); //Amount of log arrays
+
+		for (int i = 0; i < logRowCount; i++) //Cycle through each log array and get the boundaries of the logs
+		{
+			int logCount = logs.get(i).size(); //Amount of logs in the current log array
+
+			for (int j = 0; j < logCount; j++) //Cycle through each log and check if the player is colliding with it
+			{
+				MovingObject log = logs.get(i).get(j);
+				boolean isSpacerLog = false;
+
+				//ignore invisible "spacer logs"
+				if (log.isVisible() == false)
+				{
+					isSpacerLog = true;
+				}
+
+				if (isSpacerLog == false) //If the log is not a spacer log
+				{
+					if (log.getBoundsInLocal().intersects(this.getBoundsInLocal())) //if the current log intersects with the player
+					{
+						this.setCarried(true);
+					}
+				}
+			}
+		}
+	}
 	
 } //class

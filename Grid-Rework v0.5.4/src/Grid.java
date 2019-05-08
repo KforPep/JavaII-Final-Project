@@ -50,6 +50,9 @@ public class Grid
 	double rightSpawn;
 	GridGen backgroundGrid;
 	
+	//2d Array list that holds all logs to check for collision on player movement
+	ArrayList<ArrayList<MovingObject>> allLogs = new ArrayList<ArrayList<MovingObject>>();
+	
 	//Start method
 	public Pane start(double d) throws MalformedURLException 
 	{
@@ -139,6 +142,13 @@ public class Grid
 		MovingObject log4 = new MovingObject(2, 65, 55, 5, (TILE_SIZE*3), logHeight, leftSpawn-75, row(11), logColor, "RIGHT", true);
 		//Logs 5 (row 12)
 		MovingObject log5 = new MovingObject(3, 85, 55, 5, (TILE_SIZE*2), logHeight, rightSpawn, row(12), logColor, "LEFT", true);
+		
+		//Add all log arrays to the allLogs 2d array
+		allLogs.add(log1.array);
+		allLogs.add(log2.array);
+		allLogs.add(log3.array);
+		allLogs.add(log4.array);
+		allLogs.add(log5.array);
 		
 		//Stack pane to put objects on top of each other
 		StackPane stack = new StackPane();
@@ -331,8 +341,15 @@ public class Grid
 				double newY = currentY - TILE_SIZE;
 				double newX = currentX;
 				
+				//Check if player landed on a log
+				player.checkCollision(allLogs);
+				
 				if (newY <= TOP_ROW) //Prevent moving out of upper bound & on top row
 				{}
+				else if ((newY < row(7) && newY > row(12)) && player.getCarried() == false) //drown the player if they are in water and not being carried
+				{
+					player.kill();
+				}
 				else //move player
 				{
 					player.move(newX, newY, mover);
