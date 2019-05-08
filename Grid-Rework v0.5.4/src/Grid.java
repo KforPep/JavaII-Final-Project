@@ -143,6 +143,7 @@ public class Grid
 		//Stack pane to put objects on top of each other
 		StackPane stack = new StackPane();
 		stack.getChildren().add(vbxGrid); //Add game grid to stack pane
+		stack.getChildren().add(player); //Add player to stack pane
 		
 		//Add the arrays of moving objects on to the stack pane
 		car1.toPane(stack); //Cars 1 (row 2)
@@ -155,9 +156,6 @@ public class Grid
 		log3.toPane(stack); //Logs 3 (row 10)
 		log4.toPane(stack); //Logs 4 (row 11)
 		log5.toPane(stack); //Logs 5 (row 12)
-		
-		// Add player to stack
-		stack.getChildren().add(player); //Add player to stack pane
 		
 		//Stack pane layout
 		stack.setAlignment(Pos.CENTER);
@@ -231,6 +229,7 @@ public class Grid
 		Timeline animation = new Timeline(new KeyFrame(Duration.millis(speedMillis), new EventHandler<ActionEvent>()
 		{
 			double xv = xVelocity; //X velocity of animation
+			double sendVelocity;
 			double objectStartPosition = object.getTranslateX(); //Starting position of the object
 			int frame = 0;
 			Bounds bounds = paneBounds; //Bounds of the layout pane
@@ -256,11 +255,12 @@ public class Grid
 					if (animationType.equalsIgnoreCase("LEFT")) //move left
 					{
 						object.setTranslateX(objectX - xv); //Move object left
-						xv *= -1;
+						sendVelocity = -xv;
 					}
 					else if (animationType.equalsIgnoreCase("RIGHT")) //move right
 					{
 						object.setTranslateX(objectX + xv); //Move object right
+						sendVelocity = xv;
 					}
 					
 					//If the object reaches the edge of the pane
@@ -289,7 +289,7 @@ public class Grid
 						else
 						{
 							player.setCarried(true);
-							player.carry(xv);
+							player.carry(sendVelocity);
 						}
 					}
 					else

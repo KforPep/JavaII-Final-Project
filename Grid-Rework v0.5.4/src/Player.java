@@ -49,11 +49,10 @@ public class Player extends Circle {
 	} //move
 	
 	//Carries the player
-	public void carry(double objectMovement)
+	public void carry(double sentVel)
 	{	
 		//Set player position to object position
-		this.setTranslateX(this.getTranslateX() + objectMovement);
-		//this.setTranslateY(this.getTranslateX() + objectMovement);
+		this.setTranslateX(this.getTranslateX() + sentVel);
 	} //carry
 	
 	//Kill the player
