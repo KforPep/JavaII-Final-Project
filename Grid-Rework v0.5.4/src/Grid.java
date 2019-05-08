@@ -285,6 +285,7 @@ public class Grid
 		Timeline animation = new Timeline(new KeyFrame(Duration.millis(speedMillis), new EventHandler<ActionEvent>()
 		{
 			double xv = xVelocity; //X velocity of animation
+			double playerMovement;
 			double objectStartPosition = object.getTranslateX(); //Starting position of the object
 			int frame = 0;
 			Bounds bounds = paneBounds; //Bounds of the layout pane
@@ -310,10 +311,12 @@ public class Grid
 					if (animationType.equalsIgnoreCase("LEFT")) //move left
 					{
 						object.setTranslateX(objectX - xv); //Move object left
+						playerMovement = -1*xv;
 					}
 					else if (animationType.equalsIgnoreCase("RIGHT")) //move right
 					{
 						object.setTranslateX(objectX + xv); //Move object right
+						playerMovement = xv;
 					}
 					
 					//If the object reaches the edge of the pane
@@ -342,7 +345,7 @@ public class Grid
 						else
 						{
 							player.setCarried(true);
-							player.carry(object);
+							player.carry(playerMovement);
 						}
 					}
 					else
