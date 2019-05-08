@@ -85,8 +85,10 @@ public class MovingObject extends Rectangle
 			pane.getChildren().add(array.get(i));
 		}
 	} //toPane
-	public boolean getCarry(boolean objCarry) {
+	
+	//Get carry status
+	public boolean getCarry() {
 		return carry;
-	}
+	} //getCarry
 	
 } //class
