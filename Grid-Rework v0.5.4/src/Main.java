@@ -5,12 +5,23 @@
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.CustomMenuItem;
+import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
@@ -24,6 +35,7 @@ public class Main extends Application{
 	 * It shows the scene from Grid inside of it
 	 */
 	
+	private MenuItem quit;
 	@SuppressWarnings("static-access")
 	@Override
 	public void start(Stage mainStage) {
@@ -38,6 +50,37 @@ public class Main extends Application{
 			Grid gameGrid = new Grid();
 			Pane returnedGamePane = gameGrid.start(mainStage.getHeight());	// Starts new Grid using mainStage's height for sizing
 			
+			//Option Menu Stuff
+			Menu menuOp = new Menu("Options");
+			quit = new MenuItem("Quit");
+
+			//Sound Menu Stuff
+			Menu soundMenu = new Menu("Sound");
+			//Character Noise Set up
+			CheckBox charCheck = new CheckBox();
+			Labeled charLabel = new Label("Character Noise");
+			charCheck.setSelected(true);
+			charLabel.setGraphic(charCheck);
+			CustomMenuItem charNoise = new CustomMenuItem(charLabel);
+			charNoise.setHideOnClick(false);
+
+			//Ambient Noise Set up
+			Label ambLabel = new Label("Ambient Noise");
+			CheckBox ambCheck = new CheckBox();
+			ambCheck.setSelected(true);
+			ambLabel.setGraphic(ambCheck);
+			CustomMenuItem ambNoise = new CustomMenuItem(ambLabel);
+			ambNoise.setHideOnClick(false);
+
+			//Add Menu Items
+			menuOp.getItems().addAll(quit);
+			soundMenu.getItems().addAll(charNoise, ambNoise);
+
+
+
+			MenuBar menuBar = new MenuBar();
+			menuBar.getMenus().addAll(menuOp, soundMenu);
+			
 			// These Panes cover the left and right side of the screen
 			// to hide vehicles entering and exiting the scene
 			Pane leftSideCover = new Pane();
@@ -51,6 +94,7 @@ public class Main extends Application{
 			
 			// Set left, gameplay, and right on a BorderPane
 			BorderPane totalScreen = new BorderPane();
+			totalScreen.setTop(menuBar);
 			totalScreen.setCenter(returnedGamePane);
 			totalScreen.setRight(rightSideCover);
 			totalScreen.setLeft(leftSideCover);
@@ -82,6 +126,21 @@ public class Main extends Application{
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+		// Menu Events
+				quit.setOnAction(event ->{
+					Alert alert = new Alert(AlertType.CONFIRMATION);
+					alert.setTitle("Quit?");
+					alert.setHeaderText("");
+					alert.setContentText("Are you sure you want to quit?");
+
+					Optional<ButtonType> result = alert.showAndWait();
+					if (result.get() == ButtonType.OK){
+						mainStage.close(); // closes the game
+					} else {
+					    // goes back to the game
+					}
+
+				});
 	}
 	
 	public static void main(String[] args) {
