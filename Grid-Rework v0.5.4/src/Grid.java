@@ -254,6 +254,7 @@ public class Grid
 					if (animationType.equalsIgnoreCase("LEFT")) //move left
 					{
 						object.setTranslateX(objectX - xv); //Move object left
+						xv *= -1;
 					}
 					else if (animationType.equalsIgnoreCase("RIGHT")) //move right
 					{
@@ -286,7 +287,7 @@ public class Grid
 						else
 						{
 							player.setCarried(true);
-							player.carry(object);
+							player.carry(xv);
 						}
 					}
 					else
