@@ -1,5 +1,6 @@
 import javafx.animation.TranslateTransition;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 
 public class Player extends Circle {
@@ -12,17 +13,20 @@ public class Player extends Circle {
 	boolean drowning = false; //is the player drowning?
 	boolean carried = false; //is the player being carried?
 	boolean moving = false; //is the player moving?
-	Color color; //player color
+	//Color color; //player color
+	ImagePattern pattern;
 	
-	public Player(double x, double y, double size, Color color)
+	public Player(double x, double y, double size, ImagePattern playerPattern)
 	{
 		this.x = x;
 		this.y = y;
 		this.size = size;
-		this.color = color;
+		//this.color = color;
+		this.pattern = playerPattern;
 		
 		this.setRadius(size);
-		this.setFill(color);
+		//this.setFill(color);
+		this.setFill(playerPattern);
 		this.setTranslateX(x);
 		this.setTranslateY(y);
 	} //constructor
@@ -49,11 +53,12 @@ public class Player extends Circle {
 	} //move
 	
 	//Carries the player
-	public void carry(MovingObject object)
+	public void carry(double objectMovement)
 	{	
 		//Set player position to object position
-		this.setTranslateX(object.getTranslateX());
-		this.setTranslateY(object.getTranslateY());
+		this.setTranslateX(this.getTranslateX() + objectMovement);
+		//this.setTranslateX(object.getTranslateX());
+		//this.setTranslateY(object.getTranslateY());
 	} //carry
 	
 	//Kill the player
