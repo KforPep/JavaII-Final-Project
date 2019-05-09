@@ -52,6 +52,7 @@ public class Grid
 	double leftSpawn;
 	double rightSpawn;
 	GridGen backgroundGrid;
+	private ArrayList<ArrayList<MovingObject>> allLogs = new ArrayList<ArrayList<MovingObject>>(5); //Array to hold all logs to determind their bounds
 	
 	//Start method
 	public Pane start(double d) throws MalformedURLException 
@@ -195,6 +196,13 @@ public class Grid
 		//Logs 5 (row 12)
 		MovingObject log5 = new MovingObject(3, 85, 55, 5, (TILE_SIZE*2), logHeight, rightSpawn, row(12), pattern15, "LEFT", true);
 		
+		//Add all logs to a 2D array for collision detection
+		allLogs.add(log1.array);
+		allLogs.add(log2.array);
+		allLogs.add(log3.array);
+		allLogs.add(log4.array);
+		allLogs.add(log5.array);
+		
 		//Stack pane to put objects on top of each other
 		StackPane stack = new StackPane();
 		stack.getChildren().add(vbxGrid); //Add game grid to stack pane
@@ -240,13 +248,15 @@ public class Grid
 		mover.setOnFinished(event -> { //When the player movement animation finishes
 			player.setMoving(false); //Set player moving to false
 			
-			//!! NOT WORKING YET
-			/*
-			if (player.getTranslateY() < row(7) && player.getTranslateY() > row(12)) //check if the player is drowning
+			//Check if the player is drowning
+			if (player.getTranslateY() < row(7) && player.getTranslateY() > row(12)) //Check for water rows
 			{
-				player.kill();
+				if (player.collidesWithLogs(allLogs) == true) //check if the player is on a log
+				{
+					player.kill();
+				}
 			}
-			*/
+			
 		});
 		
 		gamePane.getChildren().addAll(pane);
