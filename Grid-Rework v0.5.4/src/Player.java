@@ -26,6 +26,7 @@ public class Player extends Circle {
 	boolean moving = false; //is the player moving?
 	//Color color; //player color
 	ImagePattern pattern;
+	ArrayList<ScoreObject> scoreObjectArray;
 	
 	public Player(double x, double y, double size, int lives, ImagePattern pattern)
 	{
@@ -102,6 +103,7 @@ public class Player extends Circle {
 			if (this.lives <= 0)
 			{
 				this.reset();
+				this.resetCount++;
 			}
 		}
 	} //kill
@@ -187,12 +189,17 @@ public class Player extends Circle {
 		
 		if(this.getScore() >= 5)
 		{
+			//win window
 			Alert win = new Alert(AlertType.INFORMATION);
 			win.setTitle("WIN");
 			win.setHeaderText("You won!");
 			win.setContentText("Press OK to play again.");
 			win.show();
 			
+			for (int i = 0; i < this.scoreObjectArray.size(); i++)
+			{
+				scoreObjectArray.get(i).reset();
+			}
 			this.reset();
 		}
 	} //scorePoint
