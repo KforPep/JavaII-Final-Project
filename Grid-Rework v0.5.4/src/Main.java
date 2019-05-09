@@ -5,17 +5,39 @@
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.File;
+import java.util.Optional;
+
+import javax.swing.ImageIcon;
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
-import javafx.geometry.Pos;
+import javafx.geometry.Insets;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.CustomMenuItem;
+import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 
 public class Main extends Application{
 	
@@ -23,6 +45,8 @@ public class Main extends Application{
 	 * This class opens and controls the window.
 	 * It shows the scene from Grid inside of it
 	 */
+	private MenuItem quit;
+	public boolean gameStarted = false;
 	
 	@SuppressWarnings("static-access")
 	@Override
@@ -36,7 +60,42 @@ public class Main extends Application{
 			
 			// Add the gameplay Grid to the stage
 			Grid gameGrid = new Grid();
+			
+			Pane startPane = new Pane();
+			
 			Pane returnedGamePane = gameGrid.start(mainStage.getHeight());	// Starts new Grid using mainStage's height for sizing
+			
+			//Option Menu Stuff
+			Menu menuOp = new Menu("Options");
+			quit = new MenuItem("Quit");
+			
+			//Sound Menu Stuff
+			Menu soundMenu = new Menu("Sound");
+			//Character Noise Set up
+			CheckBox charCheck = new CheckBox();
+			Labeled charLabel = new Label("Character Noise");
+			charCheck.setSelected(true);
+			charLabel.setGraphic(charCheck);
+			CustomMenuItem charNoise = new CustomMenuItem(charLabel);
+			charNoise.setHideOnClick(false);
+			
+			//Ambient Noise Set up
+			Label ambLabel = new Label("Ambient Noise");
+			CheckBox ambCheck = new CheckBox();
+			ambCheck.setSelected(true);
+			ambLabel.setGraphic(ambCheck);
+			CustomMenuItem ambNoise = new CustomMenuItem(ambLabel);
+			ambNoise.setHideOnClick(false);
+			
+			//Add Menu Items
+			menuOp.getItems().addAll(quit);
+			soundMenu.getItems().addAll(charNoise, ambNoise);
+			
+
+			
+			MenuBar menuBar = new MenuBar();
+			menuBar.getMenus().addAll(menuOp, soundMenu);
+			
 			
 			// These Panes cover the left and right side of the screen
 			// to hide vehicles entering and exiting the scene
@@ -51,16 +110,45 @@ public class Main extends Application{
 			
 			// Set left, gameplay, and right on a BorderPane
 			BorderPane totalScreen = new BorderPane();
-			totalScreen.setCenter(returnedGamePane);
-			totalScreen.setRight(rightSideCover);
-			totalScreen.setLeft(leftSideCover);
+			totalScreen.setTop(menuBar);
+			totalScreen.setCenter(startPane);
+			
+			//Press to start
+			Label startMessage = new Label("Press any key to start the game.");
+			startMessage.setStyle("-fx-font: 60 Helvetica;");
+			startMessage.setLayoutX(550);
+			startMessage.setLayoutY(400);
+			
+			BackgroundFill background_fill = new BackgroundFill(Color.PINK,  
+                    CornerRadii.EMPTY, Insets.EMPTY); 
+			
+			Background background = new Background(background_fill); 
+			
+			startPane.setBackground(background);
+			
+			startPane.getChildren().add(startMessage);
 			
 			// Set up scene and send all key presses to the Grid
 			Scene scene = new Scene(totalScreen);
 			scene.setOnKeyPressed(e -> 
 			{
-				gameGrid.sendKeyEvent(e);
+				if (gameStarted == false)
+				{
+					totalScreen.setCenter(returnedGamePane);
+					totalScreen.setRight(rightSideCover);
+					totalScreen.setLeft(leftSideCover);
+					gameStarted = true;
+				}
+				else
+				{
+					gameGrid.sendKeyEvent(e);
+				}
 			});
+			
+			File file = new File(System.getProperty("user.dir") + "/images/Icon.jpg"); 
+			String localUrl = file.toURI().toURL().toString();
+			Image iconImage = new Image(localUrl);
+			mainStage.getIcons().add(iconImage);
 			
 			mainStage.setTitle("Class Simulator");
 			mainStage.setScene(scene);
@@ -82,6 +170,22 @@ public class Main extends Application{
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+		
+		// Menu Events
+		quit.setOnAction(event ->{
+			Alert alert = new Alert(AlertType.CONFIRMATION);
+			alert.setTitle("Quit?");
+			alert.setHeaderText("");
+			alert.setContentText("Are you sure you want to quit?");
+
+			Optional<ButtonType> result = alert.showAndWait();
+			if (result.get() == ButtonType.OK){
+				mainStage.close(); // closes the game
+			} else {
+			    // goes back to the game
+			}
+			
+		});
 	}
 	
 	public static void main(String[] args) {

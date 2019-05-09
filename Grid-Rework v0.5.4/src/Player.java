@@ -2,6 +2,7 @@ import java.util.ArrayList;
 
 import javafx.animation.TranslateTransition;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 
 public class Player extends Circle {
@@ -14,17 +15,20 @@ public class Player extends Circle {
 	boolean drowning = false; //is the player drowning?
 	boolean carried = false; //is the player being carried?
 	boolean moving = false; //is the player moving?
-	Color color; //player color
+	//Color color; //player color
+	ImagePattern pattern;
 	
-	public Player(double x, double y, double size, Color color)
+	public Player(double x, double y, double size, ImagePattern playerPattern)
 	{
 		this.x = x;
 		this.y = y;
 		this.size = size;
-		this.color = color;
+		//this.color = color;
+		this.pattern = playerPattern;
 		
 		this.setRadius(size);
-		this.setFill(color);
+		//this.setFill(color);
+		this.setFill(playerPattern);
 		this.setTranslateX(x);
 		this.setTranslateY(y);
 	} //constructor
@@ -51,24 +55,49 @@ public class Player extends Circle {
 	} //move
 	
 	//Carries the player
-	public void carry(MovingObject object)
+	public void carry(double objectMovement)
 	{	
 		//Set player position to object position
-		this.setTranslateX(object.getTranslateX());
-		this.setTranslateY(object.getTranslateY());
+		this.setTranslateX(this.getTranslateX() + objectMovement);
+		//this.setTranslateX(object.getTranslateX());
+		//this.setTranslateY(object.getTranslateY());
 	} //carry
 	
 	//Kill the player
 	public void kill()
 	{
-		/*if (this.getDrowning() == true && this.getCarried() == true) //save the player if they are being carried by a log
+		if (this.getDrowning() == true && this.getCarried() == true) //save the player if they are being carried by a log
 		{}
 		else
-		{*/
+		{
 			this.setTranslateX(x);
 			this.setTranslateY(y);
-		//}
+		}
 	} //kill
+	
+	//Determine if the player is drowning
+	public boolean collidesWithLogs(ArrayList<ArrayList<MovingObject>> logs)
+	{
+		boolean drowning = true;
+
+		//Check each log and see if it is colliding with the player
+		for (int i = 0; i < logs.size(); i++) //check each row of logs
+		{
+			for (int j = 0; j < logs.get(i).size(); j++) //check each log in the row
+			{
+				if (logs.get(i).get(j).getCarry() == true) //check if the log is set to carry the player
+				{
+					if (logs.get(i).get(j).getBoundsInParent().intersects(this.getBoundsInParent())) //check if the log intersects with the player
+					{
+						drowning = false; //Set drowning to false
+					}
+				}
+
+			}
+		}
+		
+		return drowning;
+	} //collidesWithLogs
 	
 	//Set drowning status
 	public void setDrowning(boolean drowningStatus)
@@ -105,37 +134,5 @@ public class Player extends Circle {
 	{
 		return this.moving;
 	} //getMoving
-	
-	//Check if a player is colliding with a log
-	public void checkCollision(ArrayList<ArrayList<MovingObject>> logs)
-	{
-		this.setCarried(false); //Flag the player as not being carried
-		int logRowCount = logs.size(); //Amount of log arrays
-
-		for (int i = 0; i < logRowCount; i++) //Cycle through each log array and get the boundaries of the logs
-		{
-			int logCount = logs.get(i).size(); //Amount of logs in the current log array
-
-			for (int j = 0; j < logCount; j++) //Cycle through each log and check if the player is colliding with it
-			{
-				MovingObject log = logs.get(i).get(j);
-				boolean isSpacerLog = false;
-
-				//ignore invisible "spacer logs"
-				if (log.isVisible() == false)
-				{
-					isSpacerLog = true;
-				}
-
-				if (isSpacerLog == false) //If the log is not a spacer log
-				{
-					if (log.getBoundsInLocal().intersects(this.getBoundsInLocal())) //if the current log intersects with the player
-					{
-						this.setCarried(true);
-					}
-				}
-			}
-		}
-	}
 	
 } //class
