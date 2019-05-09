@@ -6,18 +6,14 @@
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.Optional;
 
 import javax.swing.ImageIcon;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -37,13 +33,11 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
-import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Rectangle;
 
 public class Main extends Application{
 	
@@ -53,7 +47,6 @@ public class Main extends Application{
 	 */
 	private MenuItem quit;
 	public boolean gameStarted = false;
-	Grid gameGrid;
 	
 	@SuppressWarnings("static-access")
 	@Override
@@ -66,8 +59,7 @@ public class Main extends Application{
 			mainStage.setHeight(screenSize.getHeight());	//Set the height of the window to fill screen
 			
 			// Add the gameplay Grid to the stage
-			//Grid gameGrid = new Grid();
-			gameGrid = new Grid();
+			Grid gameGrid = new Grid();
 			
 			Pane startPane = new Pane();
 			
@@ -134,29 +126,6 @@ public class Main extends Application{
 			
 			startPane.setBackground(background);
 			
-			//Rectangle so the start label is more visible
-			Rectangle messageBox = new Rectangle(550, 400, 840, 100);
-			messageBox.setFill(Color.WHITE);
-
-
-			//Creates the background image and adjusts its numbers so it fits in the background
-			//FileInputStream input = new FileInputStream(System.getProperty("user.dir") + "/images/bucksrun.png"); 
-			//Image image = new Image(input); 
-
-			//BackgroundSize SCREEN_FIT = new BackgroundSize(screenSize.getWidth(),
-					//screenSize.getHeight(),
-					//true, true, true, false);
-
-			//BackgroundImage backgroundimage = new BackgroundImage(image,  
-					//BackgroundRepeat.NO_REPEAT,  
-					//BackgroundRepeat.NO_REPEAT,  
-					//BackgroundPosition.CENTER,  
-					//SCREEN_FIT); 
-
-           // Background background = new Background(backgroundimage);
-            //startPane.setBackground(background);
-            //startPane.getChildren().add(messageBox);
-			
 			startPane.getChildren().add(startMessage);
 			
 			// Set up scene and send all key presses to the Grid
@@ -169,7 +138,6 @@ public class Main extends Application{
 					totalScreen.setRight(rightSideCover);
 					totalScreen.setLeft(leftSideCover);
 					gameStarted = true;
-					timerPlay();
 				}
 				else
 				{
@@ -222,16 +190,5 @@ public class Main extends Application{
 	
 	public static void main(String[] args) {
 		launch(args);
-	}
-	public void timerPlay()
-	{
-		new Timeline(new KeyFrame(
-		        Duration.millis(1000),
-		        ae -> 
-		        {
-		        	Grid.timerRun();
-		        	timerPlay();
-		        }))
-		    .play();
 	}
 }

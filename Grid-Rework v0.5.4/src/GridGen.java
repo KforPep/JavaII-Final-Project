@@ -22,7 +22,6 @@ public class GridGen {
 	}
 		public ArrayList<ArrayList<Rectangle>> gridGen(double tileSize, int gridWidth, int gridHeight) throws MalformedURLException 
 		{		
-			
 			File file = new File(System.getProperty("user.dir") + "/images/user-top-view.jpg"); 
 			File file1 = new File(System.getProperty("user.dir") + "/images/desktop.jpg");
 			File file2 = new File(System.getProperty("user.dir") + "/images/house-1.png");
@@ -93,7 +92,7 @@ public class GridGen {
 								}
 							else if (n == 1) //if the row number is 2, color purple for safe space
 							{
-								if (i == 1 || i == 5 || i == 9 || i == 13 || i ==17)  // These are the final positions. *WIN
+								if (i == 1 || i == 5 || i == 9 || i == 13 || i ==17)
 									gridRow.get(i).setFill(pattern); //color rectangle at current index purple
 								else
 								{

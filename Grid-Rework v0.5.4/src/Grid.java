@@ -8,8 +8,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 
-import javax.management.timer.Timer;
-
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
@@ -32,6 +30,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 
 public class Grid
@@ -49,6 +48,7 @@ public class Grid
 	private double OBJECT_SPAWN_DISTANCE; //distance moving objects will spawn away from the grid
 	private double BOTTOM_ROW, TOP_ROW, RIGHT_COLUMN, LEFT_COLUMN, MIDDLE_COLUMN; //Layout positions
 	private double RESPAWN_X, RESPAWN_Y; //Respawn position
+	private double RESET_COUNT = 0; //amount of times the player has been reset
 	boolean hitOrRun;
 	
 	public TranslateTransition mover;
@@ -57,10 +57,7 @@ public class Grid
 	double rightSpawn;
 	GridGen backgroundGrid;
 	private ArrayList<ArrayList<MovingObject>> allLogs = new ArrayList<ArrayList<MovingObject>>(5); //Array to hold all logs to determind their bounds
-	public final static int gameTime = 100;
-	public static int timeChange = gameTime;
-	public static Label timerLabel = new Label();
-	static Timer timer;
+	ArrayList<ScoreObject> scoreObjects = new ArrayList<ScoreObject>(5); //array to hold score objects
 	
 	//Start method
 	public Pane start(double d) throws MalformedURLException 
@@ -69,7 +66,7 @@ public class Grid
 		gamePane.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
 		int gameSceneWidth = (int) d; // All blocks are square so height and width are equal
 		
-		TILE_SIZE = (double)((int) ((gameSceneWidth - PADDING)/GRID_WIDTH)) ; //Calculate grid tile size
+		TILE_SIZE = (double)((int) ((gameSceneWidth - PADDING) / GRID_WIDTH)) ; //Calculate grid tile size
 		//GRID_Y = TILE_SIZE * GRID_HEIGHT; //Calculate grid height measurement
 		PLAYER_SIZE = (TILE_SIZE - 5)/2; //Calculate size of the player sprite
 		SCORE_OBJECT_SIZE = PLAYER_SIZE - 3; //Size of object that shows on a spot after scoring
@@ -115,7 +112,7 @@ public class Grid
 		
 		//Draw the player
 		//Player(x, y, size, color)
-		player = new Player(RESPAWN_X, RESPAWN_Y, PLAYER_SIZE, jeffsBeautifulFacePattern);
+		player = new Player(RESPAWN_X, RESPAWN_Y, PLAYER_SIZE, 3, jeffsBeautifulFacePattern);
 		
 		//Animation to move the player
 		mover = new TranslateTransition(Duration.millis(250), player);
@@ -138,7 +135,7 @@ public class Grid
 		
 		//all these images are cars or logs or busses
 		/*
-		 * School bus
+		 * Scool bus
 		 */
 		File file9 = new File(System.getProperty("user.dir") + "/images/schoolbus.png");
 		String localUrl9 = file9.toURI().toURL().toString();
@@ -204,12 +201,9 @@ public class Grid
 		MovingObject log4 = new MovingObject(2, 65, 55, 5, (TILE_SIZE*3), logHeight, leftSpawn-75, row(11), pattern15, "RIGHT", true);
 		//Logs 5 (row 12)
 		MovingObject log5 = new MovingObject(3, 85, 55, 5, (TILE_SIZE*2), logHeight, rightSpawn, row(12), pattern15, "LEFT", true);
-
-		//Score objects
-		ArrayList<ScoreObject> scoreObjects = new ArrayList<ScoreObject>(5);
-
+		
 		//Labels
-
+		
 		//Lives label
 		Label lblLives = new Label("Lives: " + player.getLives());
 		lblLives.setTranslateX(column(4));
@@ -217,15 +211,14 @@ public class Grid
 		lblLives.setFont(new Font(40));
 		lblLives.setTextFill(Color.RED);
 		player.setLivesLabel(lblLives);
-
+		
 		//Score label
 		Label lblScore = new Label("Score: " + player.getScore() + "/5");
-		lblScore.setTranslateX(column(16));
 		lblScore.setTranslateY(row(13));
 		lblScore.setFont(new Font(40));
 		lblScore.setTextFill(Color.LIGHTGREEN);
 		player.setScoreLabel(lblScore);
-
+		
 		for (int i = 2; i < GRID_WIDTH; i += 4) //Fill the ScoreObjects array with score objects
 		{
 			scoreObjects.add(new ScoreObject(SCORE_OBJECT_SIZE, column(i), row(GRID_HEIGHT-1)));
@@ -238,17 +231,12 @@ public class Grid
 		allLogs.add(log4.array);
 		allLogs.add(log5.array);
 		
-		//Put all logs in a 2D array for collision detection
-
-		
 		//Stack pane to put objects on top of each other
 		StackPane stack = new StackPane();
 		stack.getChildren().add(vbxGrid); //Add game grid to stack pane
 		stack.getChildren().add(lblLives); //Add lives label
 		stack.getChildren().add(lblScore); //Add score label
-		timerLabel.setStyle("-fx-font: 24 Helvetica;");
-		timerLabel.setText("Time: " + timeChange);
-		stack.getChildren().add(timerLabel);
+		
 		//Add score items to pane
 		for (int i = 0; i < scoreObjects.size(); i++)
 		{
@@ -294,13 +282,14 @@ public class Grid
 			player.setMoving(false); //Set player moving to false
 			
 			//Check if the player is drowning
-			if (player.getTranslateY() < row(7) && player.getTranslateY() > row(12)) //Check for water rows
+			if (player.getTranslateY() < row(7) && player.getTranslateY() > row(13)) //Check for water rows
 			{
 				if (player.collidesWithLogs(allLogs) == true) //check if the player is on a log
 				{
-					player.kill();
+					killPlayer();
 				}
 			}
+			
 			//Check if player collides with score object
 			if (player.getTranslateY() == row(GRID_HEIGHT-1)) //Check if the player row is the row with the score objects
 			{
@@ -320,7 +309,8 @@ public class Grid
 		double row = BOTTOM_ROW - (TILE_SIZE*rowNumber);
 		return row;
 	} //row
-	//return to coordinates of a Column
+	
+	//Return the coordinates of a column
 	public double column(int columnNumber)
 	{
 		columnNumber--;
@@ -409,18 +399,12 @@ public class Grid
 					{
 						if (object.getCarry() == false) //if the object does NOT carry player
 						{
-							player.kill();
+							killPlayer();
 						}
 						else
 						{
 							player.setCarried(true);
 							player.carry(playerMovement, LEFT_COLUMN, RIGHT_COLUMN);
-							// Kill player at edge of screen while on log
-							if (player.getTranslateX() < LEFT_COLUMN - TILE_SIZE
-									|| player.getTranslateX() > RIGHT_COLUMN + TILE_SIZE)
-							{
-								player.kill();
-							}
 						}
 					}
 					else
@@ -465,20 +449,11 @@ public class Grid
 				double newY = currentY - TILE_SIZE;
 				double newX = currentX;
 				
-				//System.out.println(newY);
 				if (newY <= TOP_ROW) //Prevent moving out of upper bound & on top row
 				{}
-				else if (newY > TOP_ROW && newY <= (TOP_ROW + TILE_SIZE)) // If they are moving into the top row
-				{
-					// check if they are in a valid location
-					// to move up (checks the 5 finish locations)
-					if (player.isAtOpenTopLocation(TILE_SIZE))
-					{
-						// Only move to top row if they are in the correct position.
-						player.move(newX, newY, mover);
-					}
-
-				} else //move player
+				else if (newY == row(13) && checkBlockedColumn(newX) == true) //Prevent moving on spaces between socre objects
+				{}
+				else //move player
 				{
 					player.move(newX, newY, mover);
 				}
@@ -508,6 +483,8 @@ public class Grid
 				
 				if (newX < LEFT_COLUMN) //Prevent moving out of left bound
 				{}
+				else if (newY == row(13) && checkBlockedColumn(newX) == true) //Prevent moving on spaces between socre objects
+				{}
 				else
 				{
 					player.move(newX, newY, mover); //move player
@@ -523,6 +500,8 @@ public class Grid
 				
 				if (newX > RIGHT_COLUMN) //Prevent moving out of left bound
 				{}
+				else if (newY == row(13) && checkBlockedColumn(newX) == true) //Prevent moving on spaces between socre objects
+				{}
 				else
 				{
 					player.move(newX, newY, mover); //move player
@@ -533,16 +512,51 @@ public class Grid
 		
 	}
 	
+	//Check if the given coordinate is on a blocked column
+	public boolean checkBlockedColumn(double x)
+	{
+		boolean blocked = false;
+		
+		double offset = TILE_SIZE/2;
+		
+		if ((x > LEFT_COLUMN - OBJECT_SPAWN_DISTANCE) && (x < column(2) - offset) //check if the x coordinate is in any of the blocked columns
+				|| (x > column(2) + offset) && (x < column(6) - offset)
+				|| (x > column(6) + offset) && (x < column(10) - offset)
+				|| (x > column(10) + offset) && (x < column(14) - offset)
+				|| (x > column(14) + offset) && (x < column(18) - offset)
+				|| (x > column(18) + offset))
+		{
+			blocked = true;
+		}
+		
+		return blocked;
+	}
+	
+	//Check if the player has been reset and reset the score objects
+	public void checkReset()
+	{
+		if (player.getResetCount() > RESET_COUNT)
+		{
+			RESET_COUNT = player.getResetCount();
+			
+			for (int i = 0; i < scoreObjects.size(); i++)
+			{
+				scoreObjects.get(i).reset();
+			}
+		}
+	} //checkReset
+	
+	//Kill the player
+	public void killPlayer()
+	{
+		player.kill();
+		checkReset();
+	} //killPlayer
+	
 	// returns the game window size for proper sizing in Main
 	public int getGameSize()
 	{
 		return (int) (GRID_WIDTH * TILE_SIZE);
-	}
-	// Timer that updates time label
-	public static void timerRun()
-	{
-		timeChange--;
-		timerLabel.setText("Time: " + Integer.toString(timeChange));
 	}
 
 } //class
