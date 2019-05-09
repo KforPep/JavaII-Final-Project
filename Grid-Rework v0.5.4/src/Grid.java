@@ -61,7 +61,7 @@ public class Grid
 		gamePane.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
 		int gameSceneWidth = (int) d; // All blocks are square so height and width are equal
 		
-		TILE_SIZE = (double)((int) ((gameSceneWidth - PADDING) / GRID_WIDTH)) ; //Calculate grid tile size
+		TILE_SIZE = (double)((int) ((gameSceneWidth - PADDING)/GRID_WIDTH)) ; //Calculate grid tile size
 		//GRID_Y = TILE_SIZE * GRID_HEIGHT; //Calculate grid height measurement
 		PLAYER_SIZE = (TILE_SIZE - 5)/2; //Calculate size of the player sprite
 		OBJECT_SPAWN_DISTANCE = TILE_SIZE*1.5; //Calculate object spawn distance
@@ -360,6 +360,12 @@ public class Grid
 						{
 							player.setCarried(true);
 							player.carry(playerMovement);
+							// Kill player at edge of screen while on log
+							if (player.getTranslateX() < LEFT_COLUMN - TILE_SIZE
+									|| player.getTranslateX() > RIGHT_COLUMN + TILE_SIZE)
+							{
+								player.kill();
+							}
 						}
 					}
 					else
@@ -404,6 +410,7 @@ public class Grid
 				double newY = currentY - TILE_SIZE;
 				double newX = currentX;
 				
+				//System.out.println(newY);
 				if (newY <= TOP_ROW) //Prevent moving out of upper bound & on top row
 				{}
 				else //move player

@@ -75,6 +75,8 @@ public class Player extends Circle {
 		}
 	} //kill
 	
+	
+	
 	//Determine if the player is drowning
 	public boolean collidesWithLogs(ArrayList<ArrayList<MovingObject>> logs)
 	{
@@ -98,6 +100,30 @@ public class Player extends Circle {
 		
 		return drowning;
 	} //collidesWithLogs
+	
+	// check that the player is moving into valid top position
+		public boolean isAtOpenTopLocation(double tileSize)
+		{
+
+			// Check each location with allowance for some left/right wiggle
+			if (this.getTranslateX() > 0 * tileSize - (.5 * size) &&
+					this.getTranslateX() < 0 * tileSize + (.5 * size))
+				return true;
+			if (this.getTranslateX() > 4 * tileSize - (.5 * size) &&
+					this.getTranslateX() < 4 * tileSize + (.5 * size))
+				return true;
+			if (this.getTranslateX() > 8 * tileSize - (.5 * size) &&
+					this.getTranslateX() < 8 * tileSize + (.5 * size))
+				return true;
+			if (this.getTranslateX() > -4 * tileSize - (.5 * size) &&
+					this.getTranslateX() < -4 * tileSize + (.5 * size))
+				return true;
+			if (this.getTranslateX() > -8 * tileSize - (.5 * size) &&
+					this.getTranslateX() < -8 * tileSize + (.5 * size))
+				return true;
+
+			return false;
+		}
 	
 	//Set drowning status
 	public void setDrowning(boolean drowningStatus)
