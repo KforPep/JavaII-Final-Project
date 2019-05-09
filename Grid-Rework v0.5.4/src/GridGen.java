@@ -22,16 +22,6 @@ public class GridGen {
 	}
 		public ArrayList<ArrayList<Rectangle>> gridGen(double tileSize, int gridWidth, int gridHeight) throws MalformedURLException 
 		{		
-			ArrayList<ArrayList<Rectangle>> grid = new ArrayList<ArrayList<Rectangle>>(); //2d array list to hold rows
-			
-			//Coordinates of square being drawn
-			double x = 0;
-			double y = 0;
-			
-			
-				
-
-			
 			
 			File file = new File(System.getProperty("user.dir") + "/images/user-top-view.jpg"); 
 			File file1 = new File(System.getProperty("user.dir") + "/images/desktop.jpg");
@@ -71,6 +61,12 @@ public class GridGen {
 			ImagePattern pattern7 = new ImagePattern(localImage7);
 			ImagePattern pattern8 = new ImagePattern(localImage8);
 			
+			ArrayList<ArrayList<Rectangle>> grid = new ArrayList<ArrayList<Rectangle>>(); //2d array list to hold rows
+			
+			//Coordinates of square being drawn
+			double x = 0;
+			double y = 0;
+			
 			for (int n = 0; n < gridHeight; n++) //1 iteration = 1 row
 			{
 				ArrayList<Rectangle> gridRow = new ArrayList<Rectangle>(gridWidth); //Array list to hold squares in each row
@@ -97,7 +93,7 @@ public class GridGen {
 								}
 							else if (n == 1) //if the row number is 2, color purple for safe space
 							{
-								if (i == 1 || i == 5 || i == 9 || i == 13 || i ==17)
+								if (i == 1 || i == 5 || i == 9 || i == 13 || i ==17)  // These are the final positions. *WIN
 									gridRow.get(i).setFill(pattern); //color rectangle at current index purple
 								else
 								{
