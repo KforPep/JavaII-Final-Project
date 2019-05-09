@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 
 import javafx.animation.TranslateTransition;
+import javafx.scene.control.Label;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 
@@ -8,6 +9,10 @@ public class Player extends Circle {
 	
 	int row; //player row index
 	int column; //player column index
+	int score = 0; //player score
+	int lives = 3; //player lives
+	Label livesLabel; //Label which displays this player's lives
+	Label scoreLabel; //Label which displays this player's score
 	double x; //player X position
 	double y; //player Y position
 	double size; //player size
@@ -17,17 +22,17 @@ public class Player extends Circle {
 	//Color color; //player color
 	ImagePattern pattern;
 	
-	public Player(double x, double y, double size, ImagePattern playerPattern)
+	public Player(double x, double y, double size, ImagePattern pattern)
 	{
 		this.x = x;
 		this.y = y;
 		this.size = size;
 		//this.color = color;
-		this.pattern = playerPattern;
+		this.pattern = pattern;
 		
 		this.setRadius(size);
 		//this.setFill(color);
-		this.setFill(playerPattern);
+		this.setFill(pattern);
 		this.setTranslateX(x);
 		this.setTranslateY(y);
 	} //constructor
@@ -54,12 +59,15 @@ public class Player extends Circle {
 	} //move
 	
 	//Carries the player
-	public void carry(double objectMovement)
+	public void carry(double objectMovement, double leftBound, double rightBound)
 	{	
+		//Check if the player is out of bounds
+		if (((this.getTranslateX()+(this.size*2)) < leftBound) || ((this.getTranslateX()-(this.size*2)) > rightBound))
+		{
+			this.kill(); //kill player if they are carried off screen
+		}
 		//Set player position to object position
 		this.setTranslateX(this.getTranslateX() + objectMovement);
-		//this.setTranslateX(object.getTranslateX());
-		//this.setTranslateY(object.getTranslateY());
 	} //carry
 	
 	//Kill the player
@@ -71,6 +79,8 @@ public class Player extends Circle {
 		{
 			this.setTranslateX(x);
 			this.setTranslateY(y);
+			this.lives--;
+			this.livesLabel.setText("Lives: " + this.lives);
 		}
 	} //kill
 	
@@ -113,11 +123,45 @@ public class Player extends Circle {
 		{
 			if (scores.get(i).getBoundsInParent().intersects(this.getBoundsInParent()))
 			{
-				scores.get(i).collide(this);
-				this.reset();
+				if (scores.get(i).getActivated() == false)
+				{
+					scores.get(i).collide(this);
+					this.reset();
+				}
 			}
 		}
 	}
+	
+	//Add one to player score
+	public void scorePoint()
+	{
+		this.score++;
+		this.scoreLabel.setText("Score: " + this.score + "/5");
+	} //scorePoint
+	
+	//Get score value
+	public int getScore()
+	{
+		return this.score;
+	} //getScore
+	
+	//Set label which will track this player's lives
+	public void setLivesLabel(Label livesLabel)
+	{
+		this.livesLabel = livesLabel;
+	} //setLivesLabel
+	
+	//Set label which will track this player's score
+	public void setScoreLabel(Label scoreLabel)
+	{
+		this.scoreLabel = scoreLabel;
+	} //setScoreLabel
+	
+	//Get lives
+	public int getLives()
+	{
+		return this.lives;
+	} //getLives
 	
 	//Set drowning status
 	public void setDrowning(boolean drowningStatus)
@@ -154,5 +198,11 @@ public class Player extends Circle {
 	{
 		return this.moving;
 	} //getMoving
+	
+	//Get player size
+	public double getSize()
+	{
+		return this.size;
+	} //getSize
 	
 } //class

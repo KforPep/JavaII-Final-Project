@@ -15,6 +15,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -28,6 +29,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 
 public class Grid
@@ -200,6 +203,24 @@ public class Grid
 		//Score objects
 		ArrayList<ScoreObject> scoreObjects = new ArrayList<ScoreObject>(5);
 		
+		//Labels
+		
+		//Lives label
+		Label lblLives = new Label("Lives: " + player.getLives());
+		lblLives.setTranslateX(column(4));
+		lblLives.setTranslateY(row(13));
+		lblLives.setFont(new Font(40));
+		lblLives.setTextFill(Color.RED);
+		player.setLivesLabel(lblLives);
+		
+		//Score label
+		Label lblScore = new Label("Score: " + player.getScore() + "/5");
+		lblScore.setTranslateX(column(16));
+		lblScore.setTranslateY(row(13));
+		lblScore.setFont(new Font(40));
+		lblScore.setTextFill(Color.LIGHTGREEN);
+		player.setScoreLabel(lblScore);
+		
 		for (int i = 2; i < GRID_WIDTH; i += 4) //Fill the ScoreObjects array with score objects
 		{
 			scoreObjects.add(new ScoreObject(SCORE_OBJECT_SIZE, column(i), row(GRID_HEIGHT-1)));
@@ -212,11 +233,11 @@ public class Grid
 		allLogs.add(log4.array);
 		allLogs.add(log5.array);
 		
-		//Put all logs in a 2D array for collision detection
-		
 		//Stack pane to put objects on top of each other
 		StackPane stack = new StackPane();
 		stack.getChildren().add(vbxGrid); //Add game grid to stack pane
+		stack.getChildren().add(lblLives); //Add lives label
+		stack.getChildren().add(lblScore); //Add score label
 		
 		//Add score items to pane
 		for (int i = 0; i < scoreObjects.size(); i++)
@@ -263,7 +284,7 @@ public class Grid
 			player.setMoving(false); //Set player moving to false
 			
 			//Check if the player is drowning
-			if (player.getTranslateY() < row(7) && player.getTranslateY() > row(12)) //Check for water rows
+			if (player.getTranslateY() < row(7) && player.getTranslateY() > row(13)) //Check for water rows
 			{
 				if (player.collidesWithLogs(allLogs) == true) //check if the player is on a log
 				{
@@ -385,7 +406,7 @@ public class Grid
 						else
 						{
 							player.setCarried(true);
-							player.carry(playerMovement);
+							player.carry(playerMovement, LEFT_COLUMN, RIGHT_COLUMN);
 						}
 					}
 					else
@@ -431,6 +452,8 @@ public class Grid
 				double newX = currentX;
 				
 				if (newY <= TOP_ROW) //Prevent moving out of upper bound & on top row
+				{}
+				else if (newY == row(13) && checkBlockedColumn(newX) == true) //Prevent moving on spaces between socre objects
 				{}
 				else //move player
 				{
@@ -485,6 +508,26 @@ public class Grid
 			
 		} //player movement
 		
+	}
+	
+	//Check if the given coordinate is on a blocked column
+	public boolean checkBlockedColumn(double x)
+	{
+		boolean blocked = false;
+		
+		double offset = TILE_SIZE/2;
+		
+		if ((x > LEFT_COLUMN - OBJECT_SPAWN_DISTANCE) && (x < column(2) - offset) //check if the x coordinate is in any of the blocked columns
+				|| (x > column(2) + offset) && (x < column(6) - offset)
+				|| (x > column(6) + offset) && (x < column(10) - offset)
+				|| (x > column(10) + offset) && (x < column(14) - offset)
+				|| (x > column(14) + offset) && (x < column(18) - offset)
+				|| (x > column(18) + offset))
+		{
+			blocked = true;
+		}
+		
+		return blocked;
 	}
 	
 	// returns the game window size for proper sizing in Main
