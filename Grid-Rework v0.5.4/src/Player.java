@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 
 import javafx.animation.TranslateTransition;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 
@@ -75,6 +74,13 @@ public class Player extends Circle {
 		}
 	} //kill
 	
+	//Reset player location without killing them
+	public void reset()
+	{
+		this.setTranslateX(x);
+		this.setTranslateY(y);
+	}
+	
 	//Determine if the player is drowning
 	public boolean collidesWithLogs(ArrayList<ArrayList<MovingObject>> logs)
 	{
@@ -98,6 +104,20 @@ public class Player extends Circle {
 		
 		return drowning;
 	} //collidesWithLogs
+	
+	//Determine if player is touching a score object
+	public void collidesWithScore(ArrayList<ScoreObject> scores)
+	{
+		//Check each score item and see if it is colliding with the player
+		for (int i = 0; i < scores.size(); i++)
+		{
+			if (scores.get(i).getBoundsInParent().intersects(this.getBoundsInParent()))
+			{
+				scores.get(i).collide(this);
+				this.reset();
+			}
+		}
+	}
 	
 	//Set drowning status
 	public void setDrowning(boolean drowningStatus)

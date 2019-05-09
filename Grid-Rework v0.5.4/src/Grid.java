@@ -41,7 +41,7 @@ public class Grid
 	
 	private double TILE_SIZE; //Size of the tile, calculated on launch
 	//private double GRID_Y; //Grid height measurement
-	private double PLAYER_SIZE; //Size of player object
+	private double PLAYER_SIZE, SCORE_OBJECT_SIZE; //Size of player object
 	private double OBJECT_SPAWN_DISTANCE; //distance moving objects will spawn away from the grid
 	private double BOTTOM_ROW, TOP_ROW, RIGHT_COLUMN, LEFT_COLUMN, MIDDLE_COLUMN; //Layout positions
 	private double RESPAWN_X, RESPAWN_Y; //Respawn position
@@ -64,6 +64,7 @@ public class Grid
 		TILE_SIZE = (double)((int) ((gameSceneWidth - PADDING) / GRID_WIDTH)) ; //Calculate grid tile size
 		//GRID_Y = TILE_SIZE * GRID_HEIGHT; //Calculate grid height measurement
 		PLAYER_SIZE = (TILE_SIZE - 5)/2; //Calculate size of the player sprite
+		SCORE_OBJECT_SIZE = PLAYER_SIZE - 3; //Size of object that shows on a spot after scoring
 		OBJECT_SPAWN_DISTANCE = TILE_SIZE*1.5; //Calculate object spawn distance
 		
 		//Calculate layout positions of centers of tiles RELATIVE TO CENTER OF THE GRID
@@ -195,7 +196,14 @@ public class Grid
 		MovingObject log4 = new MovingObject(2, 65, 55, 5, (TILE_SIZE*3), logHeight, leftSpawn-75, row(11), pattern15, "RIGHT", true);
 		//Logs 5 (row 12)
 		MovingObject log5 = new MovingObject(3, 85, 55, 5, (TILE_SIZE*2), logHeight, rightSpawn, row(12), pattern15, "LEFT", true);
-
+		
+		//Score objects
+		ArrayList<ScoreObject> scoreObjects = new ArrayList<ScoreObject>(5);
+		
+		for (int i = 2; i < GRID_WIDTH; i += 4) //Fill the ScoreObjects array with score objects
+		{
+			scoreObjects.add(new ScoreObject(SCORE_OBJECT_SIZE, column(i), row(GRID_HEIGHT-1)));
+		}
 		
 		//Add all logs to a 2D array for collision detection
 		allLogs.add(log1.array);
@@ -205,12 +213,16 @@ public class Grid
 		allLogs.add(log5.array);
 		
 		//Put all logs in a 2D array for collision detection
-
 		
 		//Stack pane to put objects on top of each other
 		StackPane stack = new StackPane();
 		stack.getChildren().add(vbxGrid); //Add game grid to stack pane
 		
+		//Add score items to pane
+		for (int i = 0; i < scoreObjects.size(); i++)
+		{
+			stack.getChildren().add(scoreObjects.get(i));
+		}
 		
 		//Add the arrays of moving objects on to the stack pane
 		car1.toPane(stack); //Cars 1 (row 2)
@@ -259,6 +271,12 @@ public class Grid
 				}
 			}
 			
+			//Check if player collides with score object
+			if (player.getTranslateY() == row(GRID_HEIGHT-1)) //Check if the player row is the row with the score objects
+			{
+				player.collidesWithScore(scoreObjects);
+			}
+			
 		});
 		
 		gamePane.getChildren().addAll(pane);
@@ -272,6 +290,14 @@ public class Grid
 		double row = BOTTOM_ROW - (TILE_SIZE*rowNumber);
 		return row;
 	} //row
+	
+	//Return the coordinates of a column
+	public double column(int columnNumber)
+	{
+		columnNumber--;
+		double column = LEFT_COLUMN + (TILE_SIZE*columnNumber);
+		return column;
+	}
 	
 	//Create an animation for an array list of rectangles
 	public void animateRectangles(MovingObject obj, Player player, StackPane stack)

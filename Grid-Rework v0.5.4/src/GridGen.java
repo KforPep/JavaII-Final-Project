@@ -22,17 +22,6 @@ public class GridGen {
 	}
 		public ArrayList<ArrayList<Rectangle>> gridGen(double tileSize, int gridWidth, int gridHeight) throws MalformedURLException 
 		{		
-			ArrayList<ArrayList<Rectangle>> grid = new ArrayList<ArrayList<Rectangle>>(); //2d array list to hold rows
-			
-			//Coordinates of square being drawn
-			double x = 0;
-			double y = 0;
-			
-			
-				
-
-			
-			
 			File file = new File(System.getProperty("user.dir") + "/images/user-top-view.jpg"); 
 			File file1 = new File(System.getProperty("user.dir") + "/images/desktop.jpg");
 			File file2 = new File(System.getProperty("user.dir") + "/images/house-1.png");
@@ -70,6 +59,12 @@ public class GridGen {
 			ImagePattern pattern6 = new ImagePattern(localImage6);
 			ImagePattern pattern7 = new ImagePattern(localImage7);
 			ImagePattern pattern8 = new ImagePattern(localImage8);
+			
+			ArrayList<ArrayList<Rectangle>> grid = new ArrayList<ArrayList<Rectangle>>(); //2d array list to hold rows
+			
+			//Coordinates of square being drawn
+			double x = 0;
+			double y = 0;
 			
 			for (int n = 0; n < gridHeight; n++) //1 iteration = 1 row
 			{
