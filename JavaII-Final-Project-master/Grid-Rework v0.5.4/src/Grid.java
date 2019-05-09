@@ -7,6 +7,8 @@
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -15,6 +17,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -46,6 +49,10 @@ public class Grid
 	private double BOTTOM_ROW, TOP_ROW, RIGHT_COLUMN, LEFT_COLUMN, MIDDLE_COLUMN; //Layout positions
 	private double RESPAWN_X, RESPAWN_Y; //Respawn position
 	boolean hitOrRun;
+	
+	public static final int gameTime = 100;
+	public static int timeChange = gameTime;
+	public static Label timerLabel = new Label();
 	
 	public TranslateTransition mover;
 	Player player;
@@ -128,7 +135,7 @@ public class Grid
 		
 		//all these images are cars or logs or busses
 		/*
-		 * Scool bus
+		 * School bus
 		 */
 		File file9 = new File(System.getProperty("user.dir") + "/images/schoolbus.png");
 		String localUrl9 = file9.toURI().toURL().toString();
@@ -213,6 +220,12 @@ public class Grid
 		log5.toPane(stack); //Logs 5 (row 12)
 		
 		stack.getChildren().add(player); //Add player to stack pane
+		
+		timerLabel.setStyle("-fx-font: 24 Helvetica;");
+		timerLabel.setText("Time: " + gameTime);
+		
+		stack.getChildren().add(timerLabel);
+		
 		//Stack pane layout
 		stack.setAlignment(Pos.CENTER);
 		stack.setMaxHeight(GRID_HEIGHT);
@@ -246,6 +259,10 @@ public class Grid
 			}
 			*/
 		});
+		
+		
+		
+		
 		
 		gamePane.getChildren().addAll(pane);
 		return gamePane;
@@ -363,7 +380,6 @@ public class Grid
 		{
 			animation.setCycleCount(Timeline.INDEFINITE);
 		}
-		
 		return animation;
 	} //createTimeline
 	
@@ -452,5 +468,17 @@ public class Grid
 	{
 		return (int) (GRID_WIDTH * TILE_SIZE);
 	}
-
+	
+	public static void timerRun()
+	{
+		Timer timer = new Timer();
+		timer.scheduleAtFixedRate(new TimerTask() {
+			public void run() {
+				timeChange--;
+				timerLabel.setText("Time: " + timeChange);
+				System.out.println(timeChange);
+			}
+		}, 1000, 1000);
+	}
+	
 } //class

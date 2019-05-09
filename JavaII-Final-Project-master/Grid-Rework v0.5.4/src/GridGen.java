@@ -9,31 +9,30 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 
 public class GridGen {
 	//Generate a 2d array list of squares to form a grid
-	
+
 	public GridGen()
 	{
-		
+
 	}
-		public ArrayList<ArrayList<Rectangle>> gridGen(double tileSize, int gridWidth, int gridHeight) throws MalformedURLException 
-		{		
+		public ArrayList<ArrayList<Rectangle>> gridGen(double tileSize, int gridWidth, int gridHeight) throws MalformedURLException
+		{
 			ArrayList<ArrayList<Rectangle>> grid = new ArrayList<ArrayList<Rectangle>>(); //2d array list to hold rows
-			
+
 			//Coordinates of square being drawn
 			double x = 0;
 			double y = 0;
-			
-			
-				
 
-			
-			
-			File file = new File(System.getProperty("user.dir") + "/images/user-top-view.jpg"); 
+
+
+
+
+
+			File file = new File(System.getProperty("user.dir") + "/images/user-top-view.jpg");
 			File file1 = new File(System.getProperty("user.dir") + "/images/desktop.jpg");
 			File file2 = new File(System.getProperty("user.dir") + "/images/house-1.png");
 			File file3 = new File(System.getProperty("user.dir") + "/images/grass.png");
@@ -70,23 +69,23 @@ public class GridGen {
 			ImagePattern pattern6 = new ImagePattern(localImage6);
 			ImagePattern pattern7 = new ImagePattern(localImage7);
 			ImagePattern pattern8 = new ImagePattern(localImage8);
-			
+
 			for (int n = 0; n < gridHeight; n++) //1 iteration = 1 row
 			{
 				ArrayList<Rectangle> gridRow = new ArrayList<Rectangle>(gridWidth); //Array list to hold squares in each row
 				x = 0; //Reset X location of squares to 0
-				
+
 				for (int i = 0; i < gridWidth; i++) //fill row with squares
 				{
 					gridRow.add(new Rectangle(x, y, tileSize, tileSize)); //Create a square at the current index
 					x += tileSize; //Set the X location of the next square
-					
+
 					//Color the square
 					if (n % 2 != 0) //if the row number is odd
 					{
 						if (i % 2 != 0) //if column number is odd
 						{
-							
+
 							if(n == 13) //if the row number is either 14 or 8, color purple for safe space
 							{
 							gridRow.get(i).setFill(pattern5); //color rectangle at current index purple
@@ -104,7 +103,7 @@ public class GridGen {
 									gridRow.get(i).setFill(pattern6);
 								}
 							}
-							
+
 							else if (n == 3 && (i == 3 || i == 5)) //colors rectangles blue to show where moving object will be placed
 							{
 								gridRow.get(i).setFill(pattern7); //colors rectangle blue
@@ -123,13 +122,13 @@ public class GridGen {
 							gridRow.get(i).setFill(pattern2); //color rectangle at current index purple
 							else
 								gridRow.get(i).setFill(pattern6); //color rectangle at current index purple
-						}	
+						}
 						else if (n == 5 && (i == 4)) //colors rectangles blue to show where moving object will be placed
 						{
 							gridRow.get(i).setFill(pattern8); //colors rectangle blue
 						}
 						else //if column number is even
-						{		
+						{
 							gridRow.get(i).setFill(pattern7); //color rectangle grey
 							if (n==7)
 								gridRow.get(i).setFill(pattern3);
@@ -137,14 +136,14 @@ public class GridGen {
 					}
 					else //if the row number is even
 					{
-			
-						
+
+
 						if (i % 2 != 0) //if the column number is even
 						{
 							if (n == 0) //if the row number is 1, color purple for safe space
 							{
 							gridRow.get(i).setFill(pattern6); //color rectangle purple
-							}			
+							}
 							else {
 								gridRow.get(i).setFill(pattern7); //color rectangle grey
 							}
@@ -162,11 +161,11 @@ public class GridGen {
 						gridRow.get(i).setFill(pattern8);
 					}
 				}
-				
+
 				grid.add(gridRow); //add the row to the grid
 				y += tileSize; //set y coordinate of next row
 			}
-			
+
 			return grid;
 		} //gridGen
 }

@@ -5,15 +5,25 @@
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.ImageIcon;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -33,11 +43,13 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Rectangle;
 
 public class Main extends Application{
 	
@@ -45,8 +57,11 @@ public class Main extends Application{
 	 * This class opens and controls the window.
 	 * It shows the scene from Grid inside of it
 	 */
+	
+	
 	private MenuItem quit;
 	public boolean gameStarted = false;
+	
 	
 	@SuppressWarnings("static-access")
 	@Override
@@ -58,7 +73,7 @@ public class Main extends Application{
 			mainStage.setWidth(screenSize.getWidth()); 		//Set the width of the window to fill screen
 			mainStage.setHeight(screenSize.getHeight());	//Set the height of the window to fill screen
 			
-			// Add the gameplay Grid to the stage
+			// Add the game play Grid to the stage
 			Grid gameGrid = new Grid();
 			
 			Pane startPane = new Pane();
@@ -108,24 +123,39 @@ public class Main extends Application{
 			rightSideCover.setMinWidth((mainStage.getWidth() - mainStage.getHeight())/2);
 			rightSideCover.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
 			
-			// Set left, gameplay, and right on a BorderPane
+			// Set left, game play, and right on a BorderPane
 			BorderPane totalScreen = new BorderPane();
 			totalScreen.setTop(menuBar);
 			totalScreen.setCenter(startPane);
 			
-			//Press to start
+			//Press to start label creation
 			Label startMessage = new Label("Press any key to start the game.");
 			startMessage.setStyle("-fx-font: 60 Helvetica;");
 			startMessage.setLayoutX(550);
 			startMessage.setLayoutY(400);
 			
-			BackgroundFill background_fill = new BackgroundFill(Color.PINK,  
-                    CornerRadii.EMPTY, Insets.EMPTY); 
+			//Rectangle so the start label is more visible
+			Rectangle messageBox = new Rectangle(550, 400, 840, 100);
+			messageBox.setFill(Color.WHITE);
 			
-			Background background = new Background(background_fill); 
 			
-			startPane.setBackground(background);
-			
+			//Creates the background image and adjusts its numbers so it fits in the background
+            FileInputStream input = new FileInputStream(System.getProperty("user.dir") + "/images/bucksrun.png"); 
+            Image image = new Image(input); 
+            
+            BackgroundSize SCREEN_FIT = new BackgroundSize(screenSize.getWidth(),
+        			screenSize.getHeight(),
+        			true, true, true, false);
+            
+            BackgroundImage backgroundimage = new BackgroundImage(image,  
+                                             BackgroundRepeat.NO_REPEAT,  
+                                             BackgroundRepeat.NO_REPEAT,  
+                                             BackgroundPosition.CENTER,  
+                                             SCREEN_FIT); 
+            
+            Background background = new Background(backgroundimage);
+            startPane.setBackground(background);
+            startPane.getChildren().add(messageBox);
 			startPane.getChildren().add(startMessage);
 			
 			// Set up scene and send all key presses to the Grid
@@ -138,6 +168,7 @@ public class Main extends Application{
 					totalScreen.setRight(rightSideCover);
 					totalScreen.setLeft(leftSideCover);
 					gameStarted = true;
+					Grid.timerRun();
 				}
 				else
 				{
@@ -186,6 +217,9 @@ public class Main extends Application{
 			}
 			
 		});
+		
+		
+		
 	}
 	
 	public static void main(String[] args) {
