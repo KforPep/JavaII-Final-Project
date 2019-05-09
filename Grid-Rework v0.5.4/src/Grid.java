@@ -195,6 +195,7 @@ public class Grid
 		MovingObject log4 = new MovingObject(2, 65, 55, 5, (TILE_SIZE*3), logHeight, leftSpawn-75, row(11), pattern15, "RIGHT", true);
 		//Logs 5 (row 12)
 		MovingObject log5 = new MovingObject(3, 85, 55, 5, (TILE_SIZE*2), logHeight, rightSpawn, row(12), pattern15, "LEFT", true);
+
 		
 		//Add all logs to a 2D array for collision detection
 		allLogs.add(log1.array);
@@ -204,6 +205,7 @@ public class Grid
 		allLogs.add(log5.array);
 		
 		//Put all logs in a 2D array for collision detection
+
 		
 		//Stack pane to put objects on top of each other
 		StackPane stack = new StackPane();
