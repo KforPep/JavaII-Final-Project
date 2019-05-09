@@ -5,7 +5,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.shape.Circle;
 
 public class ScoreObject extends Circle {
-	
+	int score;
 	private boolean activated = false;
 	ArrayList<ScoreObject> array = new ArrayList<ScoreObject>(5);
 	
@@ -15,14 +15,16 @@ public class ScoreObject extends Circle {
 		this.setRadius(size);
 		this.setTranslateX(x);
 		this.setTranslateY(y);
-		
-		/*
-		for (int i = 2; i < 5; i += 4) //Fill the ScoreObjects array with score objects
-		{
-			array.add(new ScoreObject(size, x, y));
-		}
-		*/
 	} //constructor
+	
+	/*
+	public void hasWon(int inputScore) {
+		score = inputScore;
+		if (score == 5) {
+			
+		}
+	}
+	*/
 	
 	//What to do when a player collides with a score object
 	public void collide(Player player)

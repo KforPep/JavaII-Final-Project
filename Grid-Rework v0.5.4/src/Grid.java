@@ -214,6 +214,7 @@ public class Grid
 		
 		//Score label
 		Label lblScore = new Label("Score: " + player.getScore() + "/5");
+		lblScore.setTranslateX(column(16));
 		lblScore.setTranslateY(row(13));
 		lblScore.setFont(new Font(40));
 		lblScore.setTextFill(Color.LIGHTGREEN);
@@ -223,6 +224,7 @@ public class Grid
 		{
 			scoreObjects.add(new ScoreObject(SCORE_OBJECT_SIZE, column(i), row(GRID_HEIGHT-1)));
 		}
+		player.scoreObjectArray = scoreObjects;
 		
 		//Add all logs to a 2D array for collision detection
 		allLogs.add(log1.array);
