@@ -1,14 +1,19 @@
 import java.util.ArrayList;
 
 import javafx.animation.TranslateTransition;
+import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 
 public class Player extends Circle {
-	
+
 	int row; //player row index
 	int column; //player column index
+	int score = 0; //player score
+	int lives = 3; //player lives
+	Label livesLabel; //Label which displays this player's lives
+	Label scoreLabel; //Label which displays this player's score
 	double x; //player X position
 	double y; //player Y position
 	double size; //player size
@@ -17,7 +22,7 @@ public class Player extends Circle {
 	boolean moving = false; //is the player moving?
 	//Color color; //player color
 	ImagePattern pattern;
-	
+
 	public Player(double x, double y, double size, ImagePattern playerPattern)
 	{
 		this.x = x;
@@ -25,7 +30,7 @@ public class Player extends Circle {
 		this.size = size;
 		//this.color = color;
 		this.pattern = playerPattern;
-		
+
 		this.setRadius(size);
 		//this.setFill(color);
 		this.setFill(playerPattern);
@@ -36,33 +41,46 @@ public class Player extends Circle {
 	//Moves the player with key press
 	public void move(double x, double y, TranslateTransition moveAnimation)
 	{	
-		
+
 		this.setMoving(true); //flag player as moving
-		
+
 		//Set movement animation's end point
 		moveAnimation.setToY(y);
 		moveAnimation.setToX(x);
-		
+
 		moveAnimation.play(); //Play movement animation
-		
+
 		//move player
 		this.setTranslateY(y);
 		this.setTranslateX(x);
-		
+
 		moveAnimation.setFromY(y); //Set movement animation's start point Y
 		moveAnimation.setFromX(x); //Set movement animation's start point X
 		//System.out.println(currentY);
 	} //move
-	
+
 	//Carries the player
-	public void carry(double objectMovement)
+	/*public void carry(double objectMovement)
 	{	
 		//Set player position to object position
 		this.setTranslateX(this.getTranslateX() + objectMovement);
 		//this.setTranslateX(object.getTranslateX());
 		//this.setTranslateY(object.getTranslateY());
 	} //carry
-	
+	 */
+
+
+	//Carries the player
+	public void carry(double objectMovement, double leftBound, double rightBound)
+	{	
+		//Check if the player is out of bounds
+		if (((this.getTranslateX()+(this.size*2)) < leftBound) || ((this.getTranslateX()-(this.size*2)) > rightBound))
+		{
+			this.kill(); //kill player if they are carried off screen
+		}
+		this.setTranslateX(this.getTranslateX() + objectMovement);
+	}//carry
+
 	//Kill the player
 	public void kill()
 	{
@@ -74,9 +92,14 @@ public class Player extends Circle {
 			this.setTranslateY(y);
 		}
 	} //kill
-	
-	
-	
+
+	//Reset player location without killing them
+	public void reset()
+	{
+		this.setTranslateX(x);
+		this.setTranslateY(y);
+	}
+
 	//Determine if the player is drowning
 	public boolean collidesWithLogs(ArrayList<ArrayList<MovingObject>> logs)
 	{
@@ -97,68 +120,123 @@ public class Player extends Circle {
 
 			}
 		}
-		
+
 		return drowning;
 	} //collidesWithLogs
+
+	//Determine if player is touching a score object
+		public void collidesWithScore(ArrayList<ScoreObject> scores)
+		{
+			//Check each score item and see if it is colliding with the player
+			for (int i = 0; i < scores.size(); i++)
+			{
+				if (scores.get(i).getBoundsInParent().intersects(this.getBoundsInParent()))
+				{
+					if (scores.get(i).getActivated() == false)
+					{
+						scores.get(i).collide(this);
+						this.reset();
+					}
+				}
+			}
+		}
+
+		//Add one to player score
+		public void scorePoint()
+		{
+			this.score++;
+			this.scoreLabel.setText("Score: " + this.score + "/5");
+		} //scorePoint
+
+		//Get score value
+		public int getScore()
+		{
+			return this.score;
+		} //getScore
+
+		//Set label which will track this player's lives
+		public void setLivesLabel(Label livesLabel)
+		{
+			this.livesLabel = livesLabel;
+		} //setLivesLabel
+
+		//Set label which will track this player's score
+		public void setScoreLabel(Label scoreLabel)
+		{
+			this.scoreLabel = scoreLabel;
+		} //setScoreLabel
+
+		//Get lives
+		public int getLives()
+		{
+			return this.lives;
+		} //getLives
+
 	
 	// check that the player is moving into valid top position
-		public boolean isAtOpenTopLocation(double tileSize)
-		{
+	public boolean isAtOpenTopLocation(double tileSize)
+	{
 
-			// Check each location with allowance for some left/right wiggle
-			if (this.getTranslateX() > 0 * tileSize - (.5 * size) &&
-					this.getTranslateX() < 0 * tileSize + (.5 * size))
-				return true;
-			if (this.getTranslateX() > 4 * tileSize - (.5 * size) &&
-					this.getTranslateX() < 4 * tileSize + (.5 * size))
-				return true;
-			if (this.getTranslateX() > 8 * tileSize - (.5 * size) &&
-					this.getTranslateX() < 8 * tileSize + (.5 * size))
-				return true;
-			if (this.getTranslateX() > -4 * tileSize - (.5 * size) &&
-					this.getTranslateX() < -4 * tileSize + (.5 * size))
-				return true;
-			if (this.getTranslateX() > -8 * tileSize - (.5 * size) &&
-					this.getTranslateX() < -8 * tileSize + (.5 * size))
-				return true;
+		// Check each location with allowance for some left/right wiggle
+		if (this.getTranslateX() > 0 * tileSize - (.5 * size) &&
+				this.getTranslateX() < 0 * tileSize + (.5 * size))
+			return true;
+		if (this.getTranslateX() > 4 * tileSize - (.5 * size) &&
+				this.getTranslateX() < 4 * tileSize + (.5 * size))
+			return true;
+		if (this.getTranslateX() > 8 * tileSize - (.5 * size) &&
+				this.getTranslateX() < 8 * tileSize + (.5 * size))
+			return true;
+		if (this.getTranslateX() > -4 * tileSize - (.5 * size) &&
+				this.getTranslateX() < -4 * tileSize + (.5 * size))
+			return true;
+		if (this.getTranslateX() > -8 * tileSize - (.5 * size) &&
+				this.getTranslateX() < -8 * tileSize + (.5 * size))
+			return true;
 
-			return false;
-		}
-	
+		return false;
+	}
+
 	//Set drowning status
 	public void setDrowning(boolean drowningStatus)
 	{
 		this.drowning = drowningStatus;
 	} //setDrowning
-	
+
 	//Check drowning status
 	public boolean getDrowning()
 	{
 		return this.drowning;
 	} //getDrowning
-	
+
 	//Set carried status
 	public void setCarried(boolean carriedStatus)
 	{
 		this.carried = carriedStatus;
 	} //setCarried
-	
+
 	//Check carried status
 	public boolean getCarried()
 	{
 		return this.carried;
 	} //getCarried
-	
+
 	//Set moving status
 	public void setMoving(boolean isMoving)
 	{
 		this.moving = isMoving;
 	} //setMoving
-	
+
 	//Check moving status
 	public boolean getMoving()
 	{
 		return this.moving;
 	} //getMoving
 	
+	//Get player size
+	public double getSize()
+	{
+		return this.size;
+	} //getSize
+
 } //class

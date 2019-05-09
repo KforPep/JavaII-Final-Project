@@ -8,6 +8,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 
+import javax.management.timer.Timer;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
@@ -15,6 +17,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -28,6 +31,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.util.Duration;
 
 public class Grid
@@ -41,7 +45,7 @@ public class Grid
 	
 	private double TILE_SIZE; //Size of the tile, calculated on launch
 	//private double GRID_Y; //Grid height measurement
-	private double PLAYER_SIZE; //Size of player object
+	private double PLAYER_SIZE, SCORE_OBJECT_SIZE; //Size of player object
 	private double OBJECT_SPAWN_DISTANCE; //distance moving objects will spawn away from the grid
 	private double BOTTOM_ROW, TOP_ROW, RIGHT_COLUMN, LEFT_COLUMN, MIDDLE_COLUMN; //Layout positions
 	private double RESPAWN_X, RESPAWN_Y; //Respawn position
@@ -53,6 +57,10 @@ public class Grid
 	double rightSpawn;
 	GridGen backgroundGrid;
 	private ArrayList<ArrayList<MovingObject>> allLogs = new ArrayList<ArrayList<MovingObject>>(5); //Array to hold all logs to determind their bounds
+	public final static int gameTime = 100;
+	public static int timeChange = gameTime;
+	public static Label timerLabel = new Label();
+	static Timer timer;
 	
 	//Start method
 	public Pane start(double d) throws MalformedURLException 
@@ -64,6 +72,7 @@ public class Grid
 		TILE_SIZE = (double)((int) ((gameSceneWidth - PADDING)/GRID_WIDTH)) ; //Calculate grid tile size
 		//GRID_Y = TILE_SIZE * GRID_HEIGHT; //Calculate grid height measurement
 		PLAYER_SIZE = (TILE_SIZE - 5)/2; //Calculate size of the player sprite
+		SCORE_OBJECT_SIZE = PLAYER_SIZE - 3; //Size of object that shows on a spot after scoring
 		OBJECT_SPAWN_DISTANCE = TILE_SIZE*1.5; //Calculate object spawn distance
 		
 		//Calculate layout positions of centers of tiles RELATIVE TO CENTER OF THE GRID
@@ -129,7 +138,7 @@ public class Grid
 		
 		//all these images are cars or logs or busses
 		/*
-		 * Scool bus
+		 * School bus
 		 */
 		File file9 = new File(System.getProperty("user.dir") + "/images/schoolbus.png");
 		String localUrl9 = file9.toURI().toURL().toString();
@@ -196,6 +205,31 @@ public class Grid
 		//Logs 5 (row 12)
 		MovingObject log5 = new MovingObject(3, 85, 55, 5, (TILE_SIZE*2), logHeight, rightSpawn, row(12), pattern15, "LEFT", true);
 
+		//Score objects
+		ArrayList<ScoreObject> scoreObjects = new ArrayList<ScoreObject>(5);
+
+		//Labels
+
+		//Lives label
+		Label lblLives = new Label("Lives: " + player.getLives());
+		lblLives.setTranslateX(column(4));
+		lblLives.setTranslateY(row(13));
+		lblLives.setFont(new Font(40));
+		lblLives.setTextFill(Color.RED);
+		player.setLivesLabel(lblLives);
+
+		//Score label
+		Label lblScore = new Label("Score: " + player.getScore() + "/5");
+		lblScore.setTranslateX(column(16));
+		lblScore.setTranslateY(row(13));
+		lblScore.setFont(new Font(40));
+		lblScore.setTextFill(Color.LIGHTGREEN);
+		player.setScoreLabel(lblScore);
+
+		for (int i = 2; i < GRID_WIDTH; i += 4) //Fill the ScoreObjects array with score objects
+		{
+			scoreObjects.add(new ScoreObject(SCORE_OBJECT_SIZE, column(i), row(GRID_HEIGHT-1)));
+		}
 		
 		//Add all logs to a 2D array for collision detection
 		allLogs.add(log1.array);
@@ -210,7 +244,16 @@ public class Grid
 		//Stack pane to put objects on top of each other
 		StackPane stack = new StackPane();
 		stack.getChildren().add(vbxGrid); //Add game grid to stack pane
-		
+		stack.getChildren().add(lblLives); //Add lives label
+		stack.getChildren().add(lblScore); //Add score label
+		timerLabel.setStyle("-fx-font: 24 Helvetica;");
+		timerLabel.setText("Time: " + timeChange);
+		stack.getChildren().add(timerLabel);
+		//Add score items to pane
+		for (int i = 0; i < scoreObjects.size(); i++)
+		{
+			stack.getChildren().add(scoreObjects.get(i));
+		}
 		
 		//Add the arrays of moving objects on to the stack pane
 		car1.toPane(stack); //Cars 1 (row 2)
@@ -258,6 +301,11 @@ public class Grid
 					player.kill();
 				}
 			}
+			//Check if player collides with score object
+			if (player.getTranslateY() == row(GRID_HEIGHT-1)) //Check if the player row is the row with the score objects
+			{
+				player.collidesWithScore(scoreObjects);
+			}
 			
 		});
 		
@@ -272,6 +320,13 @@ public class Grid
 		double row = BOTTOM_ROW - (TILE_SIZE*rowNumber);
 		return row;
 	} //row
+	//return to coordinates of a Column
+	public double column(int columnNumber)
+	{
+		columnNumber--;
+		double column = LEFT_COLUMN + (TILE_SIZE*columnNumber);
+		return column;
+	}
 	
 	//Create an animation for an array list of rectangles
 	public void animateRectangles(MovingObject obj, Player player, StackPane stack)
@@ -359,7 +414,7 @@ public class Grid
 						else
 						{
 							player.setCarried(true);
-							player.carry(playerMovement);
+							player.carry(playerMovement, LEFT_COLUMN, RIGHT_COLUMN);
 							// Kill player at edge of screen while on log
 							if (player.getTranslateX() < LEFT_COLUMN - TILE_SIZE
 									|| player.getTranslateX() > RIGHT_COLUMN + TILE_SIZE)
@@ -413,7 +468,17 @@ public class Grid
 				//System.out.println(newY);
 				if (newY <= TOP_ROW) //Prevent moving out of upper bound & on top row
 				{}
-				else //move player
+				else if (newY > TOP_ROW && newY <= (TOP_ROW + TILE_SIZE)) // If they are moving into the top row
+				{
+					// check if they are in a valid location
+					// to move up (checks the 5 finish locations)
+					if (player.isAtOpenTopLocation(TILE_SIZE))
+					{
+						// Only move to top row if they are in the correct position.
+						player.move(newX, newY, mover);
+					}
+
+				} else //move player
 				{
 					player.move(newX, newY, mover);
 				}
@@ -472,6 +537,12 @@ public class Grid
 	public int getGameSize()
 	{
 		return (int) (GRID_WIDTH * TILE_SIZE);
+	}
+	// Timer that updates time label
+	public static void timerRun()
+	{
+		timeChange--;
+		timerLabel.setText("Time: " + Integer.toString(timeChange));
 	}
 
 } //class
