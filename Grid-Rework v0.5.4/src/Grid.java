@@ -7,6 +7,8 @@
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -15,6 +17,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -53,6 +56,11 @@ public class Grid
 	double rightSpawn;
 	GridGen backgroundGrid;
 	private ArrayList<ArrayList<MovingObject>> allLogs = new ArrayList<ArrayList<MovingObject>>(5); //Array to hold all logs to determind their bounds
+	
+	public final static int gameTime = 100;
+	public static int timeChange = gameTime;
+	public static Label timerLabel = new Label();
+	static Timer timer;
 	
 	//Start method
 	public Pane start(double d) throws MalformedURLException 
@@ -129,7 +137,7 @@ public class Grid
 		
 		//all these images are cars or logs or busses
 		/*
-		 * Scool bus
+		 * School bus
 		 */
 		File file9 = new File(System.getProperty("user.dir") + "/images/schoolbus.png");
 		String localUrl9 = file9.toURI().toURL().toString();
@@ -207,6 +215,10 @@ public class Grid
 		StackPane stack = new StackPane();
 		stack.getChildren().add(vbxGrid); //Add game grid to stack pane
 		
+		timerLabel.setStyle("-fx-font: 24 Helvetica;");
+		timerLabel.setText("Time: " + timeChange);
+
+		stack.getChildren().add(timerLabel);
 		
 		//Add the arrays of moving objects on to the stack pane
 		car1.toPane(stack); //Cars 1 (row 2)
@@ -482,6 +494,13 @@ public class Grid
 	public int getGameSize()
 	{
 		return (int) (GRID_WIDTH * TILE_SIZE);
+	}
+	
+	// Timer that updates time label
+	public static void timerRun()
+	{
+				timeChange--;
+				timerLabel.setText("Time: " + Integer.toString(timeChange));
 	}
 
 } //class

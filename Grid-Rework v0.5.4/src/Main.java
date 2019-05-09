@@ -10,10 +10,13 @@ import java.util.Optional;
 
 import javax.swing.ImageIcon;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -47,6 +50,7 @@ public class Main extends Application{
 	 */
 	private MenuItem quit;
 	public boolean gameStarted = false;
+	Grid gameGrid;
 	
 	@SuppressWarnings("static-access")
 	@Override
@@ -59,7 +63,7 @@ public class Main extends Application{
 			mainStage.setHeight(screenSize.getHeight());	//Set the height of the window to fill screen
 			
 			// Add the gameplay Grid to the stage
-			Grid gameGrid = new Grid();
+			gameGrid = new Grid();
 			
 			Pane startPane = new Pane();
 			
@@ -138,6 +142,8 @@ public class Main extends Application{
 					totalScreen.setRight(rightSideCover);
 					totalScreen.setLeft(leftSideCover);
 					gameStarted = true;
+					timerPlay();
+
 				}
 				else
 				{
@@ -190,5 +196,17 @@ public class Main extends Application{
 	
 	public static void main(String[] args) {
 		launch(args);
+	}
+	
+	public void timerPlay()
+	{
+		new Timeline(new KeyFrame(
+		        Duration.millis(1000),
+		        ae -> 
+		        {
+		        	Grid.timerRun();
+		        	timerPlay();
+		        }))
+		    .play();
 	}
 }
