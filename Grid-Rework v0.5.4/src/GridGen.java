@@ -97,7 +97,8 @@ public class GridGen {
 								}
 							else if (n == 1) //if the row number is 2, color purple for safe space
 							{
-								if (i == 1 || i == 5 || i == 9 || i == 13 || i ==17)
+								if (i == 1 || i == 5 || i == 9 || i == 13 || i ==17) // These are the final positions. *WIN
+									
 									gridRow.get(i).setFill(pattern); //color rectangle at current index purple
 								else
 								{

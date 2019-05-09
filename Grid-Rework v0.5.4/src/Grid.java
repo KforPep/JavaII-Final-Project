@@ -213,6 +213,8 @@ public class Grid
 		log5.toPane(stack); //Logs 5 (row 12)
 		
 		stack.getChildren().add(player); //Add player to stack pane
+		
+		
 		//Stack pane layout
 		stack.setAlignment(Pos.CENTER);
 		stack.setMaxHeight(GRID_HEIGHT);
@@ -346,6 +348,13 @@ public class Grid
 						{
 							player.setCarried(true);
 							player.carry(playerMovement);
+							
+							// Kill player at edge of screen while on log
+							if (player.getTranslateX() < LEFT_COLUMN - TILE_SIZE
+									|| player.getTranslateX() > RIGHT_COLUMN + TILE_SIZE)
+							{
+								player.kill();
+							}
 						}
 					}
 					else
@@ -390,12 +399,24 @@ public class Grid
 				double newY = currentY - TILE_SIZE;
 				double newX = currentX;
 				
+				System.out.println(newY);
 				if (newY <= TOP_ROW) //Prevent moving out of upper bound & on top row
 				{}
-				else //move player
+				else if (newY > TOP_ROW && newY <= (TOP_ROW + TILE_SIZE)) // If they are moving into the top row
+				{
+					// check if they are in a valid location
+					// to move up (checks the 5 finish locations)
+					if (player.isAtOpenTopLocation(TILE_SIZE))
+					{
+						// Only move to top row if they are in the correct position.
+						player.move(newX, newY, mover);
+					}
+					
+				} else //move player
 				{
 					player.move(newX, newY, mover);
 				}
+				
 			}
 			
 			//move down
