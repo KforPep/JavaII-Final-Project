@@ -48,6 +48,7 @@ public class Grid
 	private double OBJECT_SPAWN_DISTANCE; //distance moving objects will spawn away from the grid
 	private double BOTTOM_ROW, TOP_ROW, RIGHT_COLUMN, LEFT_COLUMN, MIDDLE_COLUMN; //Layout positions
 	private double RESPAWN_X, RESPAWN_Y; //Respawn position
+	private double RESET_COUNT = 0; //amount of times the player has been reset
 	boolean hitOrRun;
 	
 	public TranslateTransition mover;
@@ -56,6 +57,7 @@ public class Grid
 	double rightSpawn;
 	GridGen backgroundGrid;
 	private ArrayList<ArrayList<MovingObject>> allLogs = new ArrayList<ArrayList<MovingObject>>(5); //Array to hold all logs to determind their bounds
+	ArrayList<ScoreObject> scoreObjects = new ArrayList<ScoreObject>(5); //array to hold score objects
 	
 	//Start method
 	public Pane start(double d) throws MalformedURLException 
@@ -110,7 +112,7 @@ public class Grid
 		
 		//Draw the player
 		//Player(x, y, size, color)
-		player = new Player(RESPAWN_X, RESPAWN_Y, PLAYER_SIZE, jeffsBeautifulFacePattern);
+		player = new Player(RESPAWN_X, RESPAWN_Y, PLAYER_SIZE, 3, jeffsBeautifulFacePattern);
 		
 		//Animation to move the player
 		mover = new TranslateTransition(Duration.millis(250), player);
@@ -200,9 +202,6 @@ public class Grid
 		//Logs 5 (row 12)
 		MovingObject log5 = new MovingObject(3, 85, 55, 5, (TILE_SIZE*2), logHeight, rightSpawn, row(12), pattern15, "LEFT", true);
 		
-		//Score objects
-		ArrayList<ScoreObject> scoreObjects = new ArrayList<ScoreObject>(5);
-		
 		//Labels
 		
 		//Lives label
@@ -288,7 +287,7 @@ public class Grid
 			{
 				if (player.collidesWithLogs(allLogs) == true) //check if the player is on a log
 				{
-					player.kill();
+					killPlayer();
 				}
 			}
 			
@@ -401,7 +400,7 @@ public class Grid
 					{
 						if (object.getCarry() == false) //if the object does NOT carry player
 						{
-							player.kill();
+							killPlayer();
 						}
 						else
 						{
@@ -485,6 +484,8 @@ public class Grid
 				
 				if (newX < LEFT_COLUMN) //Prevent moving out of left bound
 				{}
+				else if (newY == row(13) && checkBlockedColumn(newX) == true) //Prevent moving on spaces between socre objects
+				{}
 				else
 				{
 					player.move(newX, newY, mover); //move player
@@ -499,6 +500,8 @@ public class Grid
 				double newY = currentY;
 				
 				if (newX > RIGHT_COLUMN) //Prevent moving out of left bound
+				{}
+				else if (newY == row(13) && checkBlockedColumn(newX) == true) //Prevent moving on spaces between socre objects
 				{}
 				else
 				{
@@ -529,6 +532,27 @@ public class Grid
 		
 		return blocked;
 	}
+	
+	//Check if the player has been reset and reset the score objects
+	public void checkReset()
+	{
+		if (player.getResetCount() > RESET_COUNT)
+		{
+			RESET_COUNT = player.getResetCount();
+			
+			for (int i = 0; i < scoreObjects.size(); i++)
+			{
+				scoreObjects.get(i).reset();
+			}
+		}
+	} //checkReset
+	
+	//Kill the player
+	public void killPlayer()
+	{
+		player.kill();
+		checkReset();
+	} //killPlayer
 	
 	// returns the game window size for proper sizing in Main
 	public int getGameSize()

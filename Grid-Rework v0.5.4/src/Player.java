@@ -10,7 +10,9 @@ public class Player extends Circle {
 	int row; //player row index
 	int column; //player column index
 	int score = 0; //player score
-	int lives = 3; //player lives
+	int lives = 3; //current player lives
+	int defaultLives; //default player lives
+	int resetCount = 0; //how many times th eplayer has been reset this session
 	Label livesLabel; //Label which displays this player's lives
 	Label scoreLabel; //Label which displays this player's score
 	double x; //player X position
@@ -22,13 +24,15 @@ public class Player extends Circle {
 	//Color color; //player color
 	ImagePattern pattern;
 	
-	public Player(double x, double y, double size, ImagePattern pattern)
+	public Player(double x, double y, double size, int lives, ImagePattern pattern)
 	{
 		this.x = x;
 		this.y = y;
 		this.size = size;
 		//this.color = color;
 		this.pattern = pattern;
+		this.lives = lives;
+		this.defaultLives = this.lives;
 		
 		this.setRadius(size);
 		//this.setFill(color);
@@ -81,15 +85,30 @@ public class Player extends Circle {
 			this.setTranslateY(y);
 			this.lives--;
 			this.livesLabel.setText("Lives: " + this.lives);
+			
+			//Reset player if they reach 0 lives
+			if (this.lives <= 0)
+			{
+				this.reset();
+			}
 		}
 	} //kill
 	
-	//Reset player location without killing them
+	//Reset player location, lives and score
 	public void reset()
+	{
+		this.resetCount++;
+		this.resetPos();
+		this.resetLives();
+		this.resetScore();
+	} //reset
+	
+	//Reset player location without killing them
+	public void resetPos()
 	{
 		this.setTranslateX(x);
 		this.setTranslateY(y);
-	}
+	} //resetPos
 	
 	//Determine if the player is drowning
 	public boolean collidesWithLogs(ArrayList<ArrayList<MovingObject>> logs)
@@ -126,7 +145,7 @@ public class Player extends Circle {
 				if (scores.get(i).getActivated() == false)
 				{
 					scores.get(i).collide(this);
-					this.reset();
+					this.resetPos();
 				}
 			}
 		}
@@ -204,5 +223,25 @@ public class Player extends Circle {
 	{
 		return this.size;
 	} //getSize
+	
+	//Reset player lives
+	public void resetLives()
+	{
+		this.lives = this.defaultLives;
+		this.livesLabel.setText("Lives: " + this.defaultLives);
+	} //resetLives
+	
+	//Reset player score
+	public void resetScore()
+	{
+		this.score = 0;
+		this.scoreLabel.setText("Score: " + this.score + "/5");
+	}
+	
+	//Get amount of player resets
+	public int getResetCount()
+	{
+		return this.resetCount;
+	} //getResetCount
 	
 } //class

@@ -21,6 +21,13 @@ public class ScoreObject extends Circle {
 		player.scorePoint();
 	} //collide
 	
+	//Reset score object
+	public void reset()
+	{
+		this.setVisible(false);
+		this.activated = false;
+	} //reset
+	
 	//Check if this object has been activated
 	public boolean getActivated()
 	{
